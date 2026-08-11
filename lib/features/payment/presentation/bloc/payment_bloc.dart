@@ -54,7 +54,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           PaymentError(
             message:
                 result.errorResponse?.toString() ??
-                    'Failed to create payment',
+                'Failed to create payment',
           ),
         );
       }
@@ -97,7 +97,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           PaymentError(
             message:
                 result.errorResponse?.toString() ??
-                    'Failed to redirect',
+                'Failed to redirect',
           ),
         );
       }
@@ -145,7 +145,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           PaymentError(
             message:
                 result.errorResponse?.toString() ??
-                    'Payment verification failed',
+                'Payment verification failed',
           ),
         );
       }
@@ -167,7 +167,8 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
 
       if (result is Success) {
         final data = result.response;
-        List payments = [];
+
+        List<PaymentModel> payments = [];
 
         if (data is Map && data.containsKey('success')) {
           final items = data['data'] ?? [];
@@ -196,15 +197,17 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             payments: payments,
           ),
         );
+
       } else if (result is Failure) {
         emit(
           PaymentError(
             message:
                 result.errorResponse?.toString() ??
-                    'Failed to load payments',
+                'Failed to load payments',
           ),
         );
       }
+
     } catch (e) {
       emit(PaymentError(message: e.toString()));
     }
@@ -246,15 +249,17 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             payment: payment,
           ),
         );
+
       } else if (result is Failure) {
         emit(
           PaymentError(
             message:
                 result.errorResponse?.toString() ??
-                    'Failed to load payment detail',
+                'Failed to load payment detail',
           ),
         );
       }
+
     } catch (e) {
       emit(PaymentError(message: e.toString()));
     }
