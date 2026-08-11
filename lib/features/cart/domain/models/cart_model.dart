@@ -108,4 +108,8 @@ class CartItemModel {
           ),
     );
   }
+
+  String get itemName => productName ?? affiliateName ?? 'Unknown';
+
+  String? get itemImage => productImage;
 }
