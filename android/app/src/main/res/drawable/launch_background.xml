@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Modify this file to customize your launch splash screen -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient
+                android:centerX="0.5"
+                android:centerY="0.3"
+                android:endColor="#064BFA"
+                android:gradientRadius="300dp"
+                android:startColor="#b7e9c9"
+                android:type="radial" />
+        </shape>
+    </item>
+
+
+
+</layer-list>
