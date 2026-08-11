@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:asood/features/payment/data/data_source/payment_api_service.dart';
+import 'package:asood/features/payment/data/datasources/payment_api_service.dart';
 import 'package:asood/features/payment/domain/models/payment_model.dart';
 
 part 'payment_event.dart';

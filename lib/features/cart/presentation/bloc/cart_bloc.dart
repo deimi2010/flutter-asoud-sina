@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:asood/core/http_client/api_client.dart';
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:asood/features/cart/data/data_source/cart_api_service.dart';
+import 'package:asood/features/cart/data/datasources/cart_api_service.dart';
 import 'package:asood/features/cart/domain/models/cart_model.dart';
 
 part 'cart_event.dart';

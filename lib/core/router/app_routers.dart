@@ -5,7 +5,7 @@ import 'package:asood/features/bank_card/screens/bank_card_list.dart';
 import 'package:asood/features/bank_card/screens/finance_part.dart';
 import 'package:asood/features/bookmarks/presentation/pages/bookmarks_page.dart';
 import 'package:asood/features/business_card/presentation/screens/business_part.dart';
-import 'package:asood/features/cart/presentation/screen/shopping_cart.dart';
+import 'package:asood/features/cart/presentation/pages/shopping_cart_page.dart';
 import 'package:asood/features/chat/presentation/pages/chat_list_page.dart';
 import 'package:asood/features/create_workspace/presentation/screen/create_workspace.dart';
 import 'package:asood/features/customer/presentation/screens/customer_dashboard_screen.dart';

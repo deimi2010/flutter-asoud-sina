@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:asood/features/wallet/data/data_source/wallet_api_service.dart';
+import 'package:asood/features/wallet/data/datasources/wallet_api_service.dart';
 import 'package:asood/features/wallet/domain/models/wallet_model.dart';
 
 part 'wallet_event.dart';

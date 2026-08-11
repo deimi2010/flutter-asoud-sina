@@ -91,7 +91,10 @@ Deliverables:
 - Preserve active Cart and Payment implementations.
 - Update imports without changing application behavior.
 
-## Phase 5: Transaction Features
+## Phase 5: Transaction Feature Structure
+
+Status: Completed on 2026-08-11. See
+`phase-5-transaction-feature-structure.md`.
 
 Migration order:
 
@@ -99,12 +102,15 @@ Migration order:
 2. Payment
 3. Wallet
 
-Reasons:
+Structural deliverables:
 
-- They currently compile but bypass repository boundaries.
-- Cart and payment contain duplicate BLoCs.
-- Their state transitions affect money/order workflows and require tests before
-  further feature work.
+- Normalize `datasources`, `repositories`, and `pages` paths where present.
+- Preserve active BLoCs, models, services, and page class names.
+- Remove the zero-byte unused Cart repository implementation placeholder.
+- Update imports without changing transaction behavior.
+
+Repository boundaries, typed results, and transaction state tests remain part
+of future behavioral reconstruction.
 
 ## Phase 6: Business Features
 
