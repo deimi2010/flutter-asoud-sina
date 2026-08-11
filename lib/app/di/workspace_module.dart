@@ -1,10 +1,10 @@
 import 'package:asood/core/http_client/api_client.dart';
-import 'package:asood/features/create_workspace/data/data_source/market_api_service.dart';
-import 'package:asood/features/create_workspace/data/data_source/region_api_services.dart';
-import 'package:asood/features/create_workspace/data/repository/create_market_repository_imp.dart';
-import 'package:asood/features/create_workspace/data/repository/region_repository_imp.dart';
-import 'package:asood/features/create_workspace/domain/repository/create_market_repository.dart';
-import 'package:asood/features/create_workspace/domain/repository/region_repository.dart';
+import 'package:asood/features/create_workspace/data/datasources/market_api_service.dart';
+import 'package:asood/features/create_workspace/data/datasources/region_api_services.dart';
+import 'package:asood/features/create_workspace/data/repositories/create_market_repository_imp.dart';
+import 'package:asood/features/create_workspace/data/repositories/region_repository_imp.dart';
+import 'package:asood/features/create_workspace/domain/repositories/create_market_repository.dart';
+import 'package:asood/features/create_workspace/domain/repositories/region_repository.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/job_managment/data/data_source/category_api_service.dart';
 import 'package:asood/features/job_managment/data/repository/category_repository_imp.dart';

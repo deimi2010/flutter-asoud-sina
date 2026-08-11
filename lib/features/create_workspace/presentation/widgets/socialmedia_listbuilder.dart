@@ -1,5 +1,5 @@
 import 'package:asood/core/constants/constants.dart';
-import 'package:asood/features/create_workspace/data/model/market_contact.dart';
+import 'package:asood/features/create_workspace/data/models/market_contact.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/create_workspace/presentation/widgets/socialmedia_selector.dart';
 import 'package:flutter/material.dart';

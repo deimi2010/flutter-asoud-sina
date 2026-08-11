@@ -1,13 +1,13 @@
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:asood/features/create_workspace/data/model/market_contact.dart';
-import 'package:asood/features/create_workspace/data/model/market_schedule.dart';
-import 'package:asood/features/create_workspace/data/model/marketbase_model.dart';
-import 'package:asood/features/create_workspace/domain/repository/create_market_repository.dart';
-import 'package:asood/features/create_workspace/domain/repository/region_repository.dart';
-import 'package:asood/features/vendor/data/model/country_model.dart';
-import 'package:asood/features/vendor/data/model/market_location_model.dart';
-import 'package:asood/features/vendor/data/model/work_hours_model.dart';
+import 'package:asood/features/create_workspace/data/models/market_contact.dart';
+import 'package:asood/features/create_workspace/data/models/market_schedule.dart';
+import 'package:asood/features/create_workspace/data/models/marketbase_model.dart';
+import 'package:asood/features/create_workspace/domain/repositories/create_market_repository.dart';
+import 'package:asood/features/create_workspace/domain/repositories/region_repository.dart';
+import 'package:asood/features/vendor/data/models/country_model.dart';
+import 'package:asood/features/vendor/data/models/market_location_model.dart';
+import 'package:asood/features/vendor/data/models/work_hours_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

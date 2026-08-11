@@ -114,6 +114,9 @@ of future behavioral reconstruction.
 
 ## Phase 6: Business Features
 
+Status: In progress. Structural normalization only; behavioral and ownership
+changes remain deferred.
+
 Provisional migration order:
 
 1. Create workspace
@@ -128,6 +131,11 @@ Provisional migration order:
 Market, vendor, and create-workspace form a coupled cluster. Their domain
 ownership must be decided before moving shared models. Files are not moved into
 Core merely because multiple features currently import them.
+
+The first Phase 6 increment normalizes the physical directory names in
+create-workspace and vendor. Existing cross-feature dependencies and the
+workspace BLoC location under vendor are preserved until ownership boundaries
+can be migrated with characterization tests.
 
 ## Future: Behavioral Feature Reconstruction
 

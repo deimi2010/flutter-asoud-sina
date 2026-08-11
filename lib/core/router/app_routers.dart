@@ -7,7 +7,7 @@ import 'package:asood/features/bookmarks/presentation/pages/bookmarks_page.dart'
 import 'package:asood/features/business_card/presentation/screens/business_part.dart';
 import 'package:asood/features/cart/presentation/pages/shopping_cart_page.dart';
 import 'package:asood/features/chat/presentation/pages/chat_list_page.dart';
-import 'package:asood/features/create_workspace/presentation/screen/create_workspace.dart';
+import 'package:asood/features/create_workspace/presentation/pages/create_workspace_page.dart';
 import 'package:asood/features/customer/presentation/screens/customer_dashboard_screen.dart';
 import 'package:asood/features/inquiry/presentation/screens/inquiry_requests.dart';
 import 'package:asood/features/inquiry/presentation/screens/main_inquiry.dart';
@@ -26,7 +26,7 @@ import 'package:asood/features/splash/presentation/pages/splash_page.dart';
 import 'package:asood/features/store_setting_screens/color_setting_screen/color_setting_screen.dart';
 import 'package:asood/features/store_setting_screens/font-txtColor_setting_screen/font_color_setting_screen.dart';
 import 'package:asood/features/store_setting_screens/takhfif_setting_screen/takhfif_screen.dart';
-import 'package:asood/features/vendor/presentation/screen/vendor_home.dart';
+import 'package:asood/features/vendor/presentation/pages/vendor_home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 

@@ -1,11 +1,11 @@
-import 'package:asood/features/create_workspace/data/model/market_contact.dart';
+import 'package:asood/features/create_workspace/data/models/market_contact.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:asood/core/models/theme_model.dart';
-import 'package:asood/features/create_workspace/data/data_source/market_api_service.dart';
-import 'package:asood/features/create_workspace/domain/repository/create_market_repository.dart';
+import 'package:asood/features/create_workspace/data/datasources/market_api_service.dart';
+import 'package:asood/features/create_workspace/domain/repositories/create_market_repository.dart';
 
-import 'package:asood/features/vendor/data/model/market_location_model.dart';
+import 'package:asood/features/vendor/data/models/market_location_model.dart';
 
 class CreateMarketRepositoryImp implements CreateMarketRepository {
   final CreateMarketApiService marketApiService;

@@ -1,5 +1,5 @@
-import 'package:asood/features/create_workspace/data/data_source/region_api_services.dart';
-import 'package:asood/features/create_workspace/domain/repository/region_repository.dart';
+import 'package:asood/features/create_workspace/data/datasources/region_api_services.dart';
+import 'package:asood/features/create_workspace/domain/repositories/region_repository.dart';
 
 class RegionRepositoryImp implements RegionRepository {
   final RegionApiServices regionApiServices;
