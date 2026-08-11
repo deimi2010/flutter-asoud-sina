@@ -31,7 +31,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         if (data is Map && data.containsKey('success')) {
           wallet = WalletModel.fromJson(data['data'] ?? data);
         } else {
-          wallet = WalletModel.fromJson(data);
+          wallet = WalletModel.fromJson(
+            Map<String, dynamic>.from(data as Map),
+          );
         }
         
         emit(WalletLoaded(wallet: wallet));
