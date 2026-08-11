@@ -29,10 +29,18 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         CartModel cart;
         
         if (data is Map && data.containsKey('success')) {
-          cart = CartModel.fromJson(data['data'] ?? data);
-        } else {
-          cart = CartModel.fromJson(data);
-        }
+  final cartData = data['data'] ?? data;
+
+  cart = CartModel.fromJson(
+    Map<String, dynamic>.from(cartData),
+  );
+} else if (data is Map) {
+  cart = CartModel.fromJson(
+    Map<String, dynamic>.from(data),
+  );
+} else {
+  throw Exception('Invalid cart response format');
+}
         
         emit(CartLoaded(cart: cart));
       } else if (result is Failure) {
