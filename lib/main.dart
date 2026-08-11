@@ -1,6 +1,6 @@
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/router/app_routers.dart';
-import 'package:asood/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:asood/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:asood/features/business_card/presentation/bloc/business_bloc.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/job_managment/presentation/bloc/jobmanagment_bloc.dart';

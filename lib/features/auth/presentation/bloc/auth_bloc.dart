@@ -2,7 +2,7 @@ import 'package:asood/core/helper/secure_storage.dart';
 import 'package:bloc/bloc.dart';
 
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:asood/features/auth/domain/repository/auth_repository.dart';
+import 'package:asood/features/auth/domain/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

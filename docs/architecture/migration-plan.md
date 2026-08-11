@@ -27,6 +27,7 @@ It is updated after each migrated feature.
 4. Keep every commit buildable where practical.
 5. Remove legacy code only after all call sites use the replacement.
 6. Do not combine architecture migration with dependency upgrades.
+7. Complete structural normalization before behavioral feature reconstruction.
 
 ## Phase 2: Core Infrastructure
 
@@ -49,26 +50,32 @@ Exit criteria:
 - Expected network failures are typed.
 - Existing endpoints remain behavior-compatible.
 
-## Phase 3: Auth Reference Feature
+## Phase 3: Structural Feature Foundation
 
-Auth is the reference migration because its boundaries are understandable and
-it exercises network, secure storage, session state, and routing.
+Status: Completed on 2026-08-11. Behavioral reconstruction is explicitly
+deferred. See `phase-3-structural-foundation.md`.
+
+Auth is the reference for directory and naming normalization because its file
+set is small and its boundaries are understandable.
 
 Deliverables:
 
-- Auth DTOs and domain entities.
-- Typed repository contract and implementation.
-- Request OTP, verify OTP, and logout behavior.
-- Auth BLoC using only domain dependencies.
-- Correct awaited token persistence.
-- Repository and BLoC tests.
+- Application capability catalog and ownership map.
+- Structural profiles for full and presentation-only features.
+- Standard Auth directory names: `datasources`, `repositories`, `bloc`, and
+  `pages`.
+- Import updates with no intentional logic or UI changes.
+- Analyze, test, and Android build verification.
 
 Exit criteria:
 
-- Auth presentation has no data-layer imports.
-- Logout is implemented and tested.
-- No `dynamic` in the auth domain API.
+- Auth has one consistent physical structure.
+- No legacy Auth paths remain imported.
+- Existing behavior and public contracts are preserved.
 - Login and OTP UI remain visually unchanged.
+
+Typed Auth contracts, DTO/entity separation, logout reconstruction, and Auth
+BLoC behavior tests are deferred to the later behavioral reconstruction phase.
 
 ## Phase 4: Navigation And Scope
 
@@ -110,6 +117,13 @@ Provisional migration order:
 Market, vendor, and create-workspace form a coupled cluster. Their domain
 ownership must be decided before moving shared models. Files are not moved into
 Core merely because multiple features currently import them.
+
+## Future: Behavioral Feature Reconstruction
+
+After structural normalization is complete, features may be rebuilt one at a
+time. The first behavioral reference feature remains Auth, followed by
+transaction and business features. That work requires separate approval and is
+not implied by moving or renaming files.
 
 ## Known Violations To Remove During Migration
 

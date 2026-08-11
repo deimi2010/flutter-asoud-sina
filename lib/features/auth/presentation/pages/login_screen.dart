@@ -1,7 +1,7 @@
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/router/app_routers.dart';
-import 'package:asood/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:asood/features/auth/presentation/screen/terms_conditions.dart';
+import 'package:asood/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:asood/features/auth/presentation/pages/terms_conditions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

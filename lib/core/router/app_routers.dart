@@ -1,6 +1,6 @@
 import 'package:asood/core/models/market_model.dart';
-import 'package:asood/features/auth/presentation/screen/login_screen.dart';
-import 'package:asood/features/auth/presentation/screen/otp_screen.dart';
+import 'package:asood/features/auth/presentation/pages/login_screen.dart';
+import 'package:asood/features/auth/presentation/pages/otp_screen.dart';
 import 'package:asood/features/bank_card/screens/bank_card_list.dart';
 import 'package:asood/features/bank_card/screens/finance_part.dart';
 import 'package:asood/features/bookmarks/bookmarks_page.dart';

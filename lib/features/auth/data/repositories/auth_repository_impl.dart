@@ -1,11 +1,11 @@
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:asood/features/auth/data/data_source/auth_api_service.dart';
-import 'package:asood/features/auth/domain/repository/auth_repository.dart';
+import 'package:asood/features/auth/data/datasources/auth_api_service.dart';
+import 'package:asood/features/auth/domain/repositories/auth_repository.dart';
 
-class AuthRepositoryImp implements AuthRepository {
+class AuthRepositoryImpl implements AuthRepository {
   final AuthApiService authApiService;
 
-  AuthRepositoryImp(this.authApiService);
+  AuthRepositoryImpl(this.authApiService);
   @override
   //logout user
   Future<dynamic> logout() async {

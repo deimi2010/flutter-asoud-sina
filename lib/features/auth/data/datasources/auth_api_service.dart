@@ -34,18 +34,24 @@ class AuthApiService {
         body,
         headers: Endpoints.simpleHeader,
       );
-      
+
       if (res.data['data']?['jwt']?['access'] != null) {
         final jwtAccess = res.data['data']['jwt']['access'];
         await SecureStorage.writeSecureStorage(Keys.token, jwtAccess);
-        
+
         if (res.data['data']['jwt']?['refresh'] != null) {
-          await SecureStorage.writeSecureStorage('jwt_refresh', res.data['data']['jwt']['refresh']);
+          await SecureStorage.writeSecureStorage(
+            'jwt_refresh',
+            res.data['data']['jwt']['refresh'],
+          );
         }
       } else if (res.data['data']?['token'] != null) {
-        await SecureStorage.writeSecureStorage(Keys.token, res.data['data']['token']);
+        await SecureStorage.writeSecureStorage(
+          Keys.token,
+          res.data['data']['token'],
+        );
       }
-      
+
       return apiStatus(res);
     } catch (e) {
       return customApiStatus();
@@ -74,21 +80,23 @@ class AuthApiService {
     try {
       final refreshToken = await SecureStorage.readSecureStorage('jwt_refresh');
       final accessToken = await SecureStorage.readSecureStorage(Keys.token);
-      
-      if ((refreshToken != null && refreshToken != "ND") || 
+
+      if ((refreshToken != null && refreshToken != "ND") ||
           (accessToken != null && accessToken != "ND")) {
         try {
-          final logoutData = refreshToken != null && refreshToken != "ND" 
-              ? {'refresh': refreshToken} 
-              : {};
-          
-          final headers = accessToken != null && accessToken != "ND"
-              ? {
-                  ...Endpoints.simpleHeader,
-                  'Authorization': 'Bearer $accessToken',
-                }
-              : Endpoints.simpleHeader;
-          
+          final logoutData =
+              refreshToken != null && refreshToken != "ND"
+                  ? {'refresh': refreshToken}
+                  : {};
+
+          final headers =
+              accessToken != null && accessToken != "ND"
+                  ? {
+                    ...Endpoints.simpleHeader,
+                    'Authorization': 'Bearer $accessToken',
+                  }
+                  : Endpoints.simpleHeader;
+
           await dioClient.postData(
             Endpoints.jwtLogout,
             logoutData,
@@ -100,11 +108,15 @@ class AuthApiService {
           }
         }
       }
-      
+
       await SecureStorage.deleteSecureStorage('jwt_refresh');
       await SecureStorage.writeSecureStorage(Keys.token, "ND");
-      
-      return Success(code: 200, response: {}, message: 'Logged out successfully');
+
+      return Success(
+        code: 200,
+        response: {},
+        message: 'Logged out successfully',
+      );
     } catch (e) {
       return customApiStatus();
     }
