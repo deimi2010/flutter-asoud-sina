@@ -35,7 +35,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             payment = PaymentModel.fromJson(paymentData);
           }
         } else if (data is Map) {
-          payment = PaymentModel.fromJson(data);
+          payment = PaymentModel.fromJson(Map<String, dynamic>.from(data))
         }
         
         emit(PaymentCreated(payment: payment));
@@ -91,7 +91,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             payment = PaymentModel.fromJson(paymentData);
           }
         } else if (data is Map) {
-          payment = PaymentModel.fromJson(data);
+          payment = PaymentModel.fromJson(Map<String, dynamic>.from(data))
         }
         
         emit(PaymentVerified(payment: payment));
@@ -153,7 +153,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             payment = PaymentModel.fromJson(paymentData);
           }
         } else if (data is Map) {
-          payment = PaymentModel.fromJson(data);
+          payment = PaymentModel.fromJson(Map<String, dynamic>.from(data))
         }
         
         emit(PaymentDetailLoaded(payment: payment));
