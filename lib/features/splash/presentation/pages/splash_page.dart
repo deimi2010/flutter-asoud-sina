@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/router/app_routers.dart';
-import 'package:asood/features/splash/blocs/splash_bloc.dart';
+import 'package:asood/features/splash/presentation/bloc/splash_bloc.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

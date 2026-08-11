@@ -77,14 +77,19 @@ Exit criteria:
 Typed Auth contracts, DTO/entity separation, logout reconstruction, and Auth
 BLoC behavior tests are deferred to the later behavioral reconstruction phase.
 
-## Phase 4: Navigation And Scope
+## Phase 4: Small Feature Structural Normalization
+
+Status: Completed on 2026-08-11. See
+`phase-4-small-feature-structure.md`.
 
 Deliverables:
 
-- Typed route arguments.
-- Removal of route-builder side effects.
-- Route/page-scoped feature BLoCs.
-- Only true application state remains globally provided.
+- Normalize Splash, Chat, Notification, Reservation, Service, Profile, and
+  Bookmarks under `presentation`.
+- Standardize `bloc`, `pages`, and `widgets` directory names.
+- Remove unused duplicate Cart and Payment BLoC skeletons.
+- Preserve active Cart and Payment implementations.
+- Update imports without changing application behavior.
 
 ## Phase 5: Transaction Features
 
@@ -124,6 +129,10 @@ After structural normalization is complete, features may be rebuilt one at a
 time. The first behavioral reference feature remains Auth, followed by
 transaction and business features. That work requires separate approval and is
 not implied by moving or renaming files.
+
+Navigation improvements such as typed route arguments, removal of route-builder
+side effects, and page-scoped BLoCs are also deferred because they can change
+runtime behavior and lifecycle.
 
 ## Known Violations To Remove During Migration
 

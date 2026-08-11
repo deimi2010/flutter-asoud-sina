@@ -2,7 +2,7 @@ import 'package:asood/features/business_card/presentation/bloc/business_bloc.dar
 import 'package:asood/features/customer/presentation/blocs/customer/customer_bloc.dart';
 import 'package:asood/features/customer/presentation/blocs/profile/profile_bloc.dart';
 import 'package:asood/features/product/blocs/product_bloc.dart';
-import 'package:asood/features/splash/blocs/splash_bloc.dart';
+import 'package:asood/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 void registerPresentationModule(GetIt locator) {

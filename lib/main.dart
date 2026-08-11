@@ -8,7 +8,7 @@ import 'package:asood/features/market/presentation/blocs/add_product/add_product
 import 'package:asood/features/market/presentation/blocs/bloc/market_bloc.dart';
 import 'package:asood/features/market/presentation/blocs/comment/comment_bloc.dart';
 import 'package:asood/features/market/presentation/blocs/theme/theme_bloc.dart';
-import 'package:asood/features/splash/blocs/splash_bloc.dart';
+import 'package:asood/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:asood/features/vendor/presentation/bloc/vendor/vendor_bloc.dart';
 import 'package:asood/features/vendor/presentation/bloc/workspace/workspace_bloc.dart';
 import 'package:asood/features/cart/presentation/bloc/cart_bloc.dart';

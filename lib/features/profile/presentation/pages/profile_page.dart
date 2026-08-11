@@ -6,7 +6,7 @@ import 'package:asood/core/widgets/custom_button.dart';
 import 'package:asood/core/widgets/custom_textfield.dart';
 
 import 'package:asood/core/widgets/simple_bot_navbar.dart';
-import 'package:asood/features/profile/widget/picture_selector.dart';
+import 'package:asood/features/profile/presentation/widgets/picture_selector.dart';
 
 class VendorProfileScreen extends StatelessWidget {
   const VendorProfileScreen({super.key});
