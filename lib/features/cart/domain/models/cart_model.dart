@@ -23,7 +23,7 @@ class CartModel {
               .toList() ??
           [],
       totalPrice: (json['total_price'] ?? 0.0).toDouble(),
-      totalItems: json['total_items'] ?? 0,
+      totalItems: int.tryParse(json['total_items']?.toString() ?? '0') ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : DateTime.now(),
@@ -81,7 +81,7 @@ class CartItemModel {
       affiliateId: json['affiliate']?['id']?.toString(),
       affiliateName: json['affiliate']?['name']?.toString() ??
           json['affiliate_name']?.toString(),
-      quantity: json['quantity'] ?? 1,
+      quantity: int.tryParse(json['quantity']?.toString() ?? '1') ?? 1,
       price: json['price']?.toDouble() ?? json['product']?['main_price']?.toDouble(),
       totalPrice: json['total_price']?.toDouble(),
     );
