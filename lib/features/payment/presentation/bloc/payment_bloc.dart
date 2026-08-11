@@ -29,14 +29,17 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
         final data = result.response;
         PaymentModel? payment;
         
-        if (data is Map && data.containsKey('success')) {
-          final paymentData = data['data'] ?? data;
-          if (paymentData is Map) {
-            payment = PaymentModel.fromJson(paymentData);
-          }
-        } else if (data is Map) {
-          payment = PaymentModel.fromJson(Map<String, dynamic>.from(data))
-        }
+      if (data is Map && data.containsKey('success')) {
+  final paymentData = data['data'] ?? data;
+
+  if (paymentData is Map) {
+    payment = PaymentModel.fromJson(paymentData);
+  }
+} else if (data is Map) {
+  payment = PaymentModel.fromJson(
+    Map<String, dynamic>.from(data),
+  );
+}
         
         emit(PaymentCreated(payment: payment));
       } else if (result is Failure) {
