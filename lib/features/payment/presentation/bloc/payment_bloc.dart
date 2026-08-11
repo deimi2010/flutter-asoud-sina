@@ -33,7 +33,9 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
   final paymentData = data['data'] ?? data;
 
   if (paymentData is Map) {
-    payment = PaymentModel.fromJson(paymentData);
+    payment = PaymentModel.fromJson(
+  Map<String, dynamic>.from(paymentData),
+);
   }
 } else if (data is Map) {
   payment = PaymentModel.fromJson(
