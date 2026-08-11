@@ -1,106 +1,42 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:asood/core/constants/constants.dart';
-import 'package:asood/core/helper/secure_storage.dart';
+import 'package:asood/core/constants/endpoints.dart';
+import 'package:asood/core/network/auth_interceptor.dart';
+import 'package:asood/core/network/safe_log_interceptor.dart';
+import 'package:asood/core/network/token_refresh_interceptor.dart';
+import 'package:asood/core/storage/secure_token_storage.dart';
+import 'package:asood/core/storage/token_storage.dart';
 
 import 'error_response.dart';
 
 class DioClient {
   final String appBaseUrl;
-  final int timeoutInSeconds = 30;
-  late Dio dio;
+  static const int timeoutInSeconds = 30;
+  final Dio dio;
 
-  DioClient({required this.appBaseUrl}) {
-    // Initialize Dio with base options
-    dio = Dio(
-      BaseOptions(
+  DioClient({required this.appBaseUrl, Dio? dio, TokenStorage? tokenStorage})
+    : dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: appBaseUrl,
+              connectTimeout: Duration(seconds: timeoutInSeconds),
+              receiveTimeout: Duration(seconds: timeoutInSeconds),
+              headers: {'Content-Type': 'application/json; charset=utf-8'},
+            ),
+          ) {
+    final resolvedTokenStorage = tokenStorage ?? SecureTokenStorage();
+    this.dio.interceptors.addAll([
+      AuthInterceptor(tokenStorage: resolvedTokenStorage),
+      TokenRefreshInterceptor(
+        client: this.dio,
+        tokenStorage: resolvedTokenStorage,
         baseUrl: appBaseUrl,
-        connectTimeout: Duration(seconds: timeoutInSeconds),
-        receiveTimeout: Duration(seconds: timeoutInSeconds),
-        headers: {'Content-Type': 'application/json; charset=utf-8'},
+        refreshPath: Endpoints.jwtRefresh,
       ),
-    );
-
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await SecureStorage.readSecureStorage(Keys.token);
-          if (token != null && token != "ND") {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          if (kDebugMode) {
-            debugPrint('API Request: ${options.method} ${options.path}');
-          }
-          return handler.next(options);
-        },
-        onError: (error, handler) async {
-          if (error.response?.statusCode == 401) {
-            try {
-              final refreshToken = await SecureStorage.readSecureStorage('jwt_refresh');
-              if (refreshToken != null && refreshToken != "ND") {
-                try {
-                  final refreshDio = Dio(BaseOptions(
-                    baseUrl: appBaseUrl,
-                    headers: {'Content-Type': 'application/json; charset=utf-8'},
-                  ));
-                  
-                  final refreshResponse = await refreshDio.post(
-                    'user/jwt/refresh/',
-                    data: {'refresh': refreshToken},
-                  );
-                  
-                  if (refreshResponse.statusCode == 200 && 
-                      refreshResponse.data['success'] == true) {
-                    final jwt = refreshResponse.data['data'];
-                    final newAccessToken = jwt['access'];
-                    final newRefreshToken = jwt['refresh'];
-                    
-                    await SecureStorage.writeSecureStorage(Keys.token, newAccessToken);
-                    await SecureStorage.writeSecureStorage('jwt_refresh', newRefreshToken);
-                    
-                    error.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-                    final opts = Options(
-                      method: error.requestOptions.method,
-                      headers: error.requestOptions.headers,
-                    );
-                    final cloneReq = await dio.request(
-                      error.requestOptions.path,
-                      options: opts,
-                      data: error.requestOptions.data,
-                      queryParameters: error.requestOptions.queryParameters,
-                    );
-                    return handler.resolve(cloneReq);
-                  }
-                } catch (refreshError) {
-                  if (kDebugMode) {
-                    debugPrint('Token refresh failed: $refreshError');
-                  }
-                  await SecureStorage.writeSecureStorage(Keys.token, "ND");
-                  await SecureStorage.deleteSecureStorage('jwt_refresh');
-                }
-              }
-            } catch (e) {
-              if (kDebugMode) {
-                debugPrint('Error in token refresh handler: $e');
-              }
-            }
-          }
-          return handler.next(error);
-        },
-      ),
-    );
-    dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: false,
-        responseBody: true,
-        error: true,
-      ),
-    );
+      const SafeLogInterceptor(),
+    ]);
   }
 
   // Perform a GET request
@@ -128,9 +64,6 @@ class DioClient {
     Map<String, dynamic>? headers,
   }) async {
     try {
-      if (kDebugMode) {
-        debugPrint('====> API Body: $data');
-      }
       Response response = await dio.post(
         uri,
         data: data,
@@ -170,11 +103,6 @@ class DioClient {
           );
         }
       }
-      if (kDebugMode) {
-        debugPrint(
-          '====> API Multipart POST: $uri with data: $data and ${multipartBody.length} file(s)',
-        );
-      }
       Response response = await dio.post(
         uri,
         data: formData,
@@ -213,11 +141,6 @@ class DioClient {
             ),
           );
         }
-      }
-      if (kDebugMode) {
-        debugPrint(
-          '====> API Multipart PATCH: $uri with data: $data and ${multipartBody.length} file(s)',
-        );
       }
       Response response = await dio.patch(
         uri,
@@ -284,16 +207,12 @@ class DioClient {
 
   // Handle API responses (success or failure)
   Response _handleResponse(Response response, String uri) {
-    if (kDebugMode) {
-      debugPrint(
-        '====> API Response: [${response.statusCode}] $uri\n${response.data}',
-      );
-    }
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    final statusCode = response.statusCode;
+    if (statusCode != null && statusCode >= 200 && statusCode < 300) {
       return response;
     } else {
       // Convert HTTP error code to readable message
-      String errorMessage = handleHttpError(response.statusCode!);
+      String errorMessage = handleHttpError(statusCode ?? 500);
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
@@ -303,14 +222,11 @@ class DioClient {
   }
 
   // Handle Dio errors (network or server-related issues)
-  Response _handleDioException(DioException error, String uri) {
-    if (kDebugMode) {
-      debugPrint('====> Error on $uri: ${error.message}');
-    }
+  Never _handleDioException(DioException error, String uri) {
     // Provide an appropriate error message
     String errorMessage =
         error.response != null
-            ? handleHttpError(error.response!.statusCode!)
+            ? handleHttpError(error.response!.statusCode ?? 500)
             : 'Unable to connect to the server';
     throw DioException(
       requestOptions: error.requestOptions,

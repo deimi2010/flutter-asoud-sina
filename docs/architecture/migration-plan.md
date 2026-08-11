@@ -30,6 +30,8 @@ It is updated after each migrated feature.
 
 ## Phase 2: Core Infrastructure
 
+Status: Completed on 2026-08-11. See `phase-2-core.md`.
+
 Deliverables:
 
 - Typed `Result<T>` and failure hierarchy.
