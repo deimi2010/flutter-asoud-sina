@@ -1,80 +1,97 @@
 # Flutter Asoud Sina
 
+یک پروژه Flutter تمیز و خوب‌ساختار شده با الگوی BLoC.
+
 A clean and well-structured Flutter project with BLoC pattern architecture.
 
-## 🏗️ Architecture
+---
 
-This project follows best practices with:
-- **BLoC Pattern** for state management
-- **Clean Architecture** principles
-- **Dependency Injection (DI)** using `get_it`
+## 🏗️ معماری پروژه | Architecture
 
-## 📦 Project Structure
+این پروژه بر اساس بهترین روش‌های توسعه ساخته شده است:
+
+- **BLoC Pattern** - الگوی مدیریت وضعیت
+- **Clean Architecture** - اصول معماری تمیز
+- **Dependency Injection (DI)** با `get_it` - تزریق وابستگی
+
+---
+
+## 📦 ساختار پروژه | Project Structure
 
 ```
 lib/
 ├── core/
-│   └── di/              # Dependency Injection setup
-├── features/            # Feature modules
-│   ├── data/           # Data layer
-│   ├── domain/         # Domain layer
-│   └── presentation/   # Presentation layer
+│   └── di/              # تنظیم تزریق وابستگی
+├── features/            # ماژول‌های ویژگی
+│   ├── data/           # لایه داده‌ها
+│   ├── domain/         # لایه دامنه
+│   └── presentation/   # لایه ارائه
 └── main.dart
 ```
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Flutter SDK (latest version)
+## 🚀 شروع کار | Getting Started
+
+### پیش‌نیازها | Prerequisites
+- Flutter SDK (آخرین نسخه)
 - Dart SDK
 
-### Installation
+### نصب | Installation
 
-1. Clone the repository:
+1. کلون کردن Repository:
 ```bash
 git clone https://github.com/deimi2010/flutter-asoud-sina.git
 cd flutter-asoud-sina
 ```
 
-2. Get dependencies:
+2. دانلود وابستگی‌ها:
 ```bash
 flutter pub get
 ```
 
-3. Run the app:
+3. اجرای برنامه:
 ```bash
 flutter run
 ```
 
-## 📚 Technologies Used
+---
 
-- **Flutter** - UI Framework
-- **Dart** - Programming Language
-- **BLoC** - State Management
-- **get_it** - Dependency Injection
-- **Clean Architecture** - Code Organization
+## 📚 تکنولوژی‌های استفاده‌شده | Technologies Used
 
-## 🛠️ Development
+- **Flutter** - چارچوب رابط کاربری
+- **Dart** - زبان برنامه‌نویسی
+- **BLoC** - مدیریت وضعیت
+- **get_it** - تزریق وابستگی
+- **Clean Architecture** - سازمان‌دهی کد
 
-### Running Tests
+---
+
+## 🛠️ توسعه | Development
+
+### اجرای تست‌ها | Running Tests
 ```bash
 flutter test
 ```
 
-### Building Release
+### ساخت نسخه انتشار | Building Release
 ```bash
 flutter build apk --release
 flutter build ios --release
 ```
 
-## 📝 License
+---
 
-This project is open source and available under the MIT License.
+## 📝 مجوز | License
 
-## 👨‍💻 Author
+این پروژه متن‌باز است و تحت مجوز MIT در دسترس است.
+
+---
+
+## 👨‍💻 نویسنده | Author
 
 **deimi2010**
 
 ---
 
-**Happy Coding! 🎉**
+**خوشحال کدنویسی! 🎉**
