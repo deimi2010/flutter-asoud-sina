@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/widgets/appbar/default_appbar.dart';
 import 'package:asood/features/payment/presentation/bloc/payment_bloc.dart';
-import 'package:asood/features/payment/domain/models/payment_model.dart';
 
 class PaymentScreen extends StatelessWidget {
   final double amount;
@@ -52,7 +51,7 @@ class _PaymentScreenContentState extends State<_PaymentScreenContent> {
   @override
   Widget build(BuildContext context) {
     final formatter = NumberFormat('#,###');
-    
+
     return Container(
       color: Colora.primaryColor,
       child: SafeArea(
@@ -113,9 +112,7 @@ class _PaymentScreenContentState extends State<_PaymentScreenContent> {
                       state is PaymentVerifying)
                     Container(
                       color: Colors.black54,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: const Center(child: CircularProgressIndicator()),
                     ),
                 ],
               );
@@ -202,7 +199,8 @@ class _PaymentScreenContentState extends State<_PaymentScreenContent> {
   }
 
   Widget _buildPaymentButton(BuildContext context, PaymentState state) {
-    final isLoading = state is PaymentLoading ||
+    final isLoading =
+        state is PaymentLoading ||
         state is PaymentRedirecting ||
         state is PaymentVerifying;
 
@@ -213,37 +211,38 @@ class _PaymentScreenContentState extends State<_PaymentScreenContent> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: MaterialButton(
-        onPressed: isLoading || selectedGateway == null
-            ? null
-            : () {
-                context.read<PaymentBloc>().add(
-                      CreatePayment({
-                        'amount': widget.amount,
-                        'target_content': widget.targetContent,
-                        'target_id': widget.targetId,
-                        'gateway': selectedGateway,
-                      }),
-                    );
-              },
-        child: isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
+        onPressed:
+            isLoading || selectedGateway == null
+                ? null
+                : () {
+                  context.read<PaymentBloc>().add(
+                    CreatePayment({
+                      'amount': widget.amount,
+                      'target_content': widget.targetContent,
+                      'target_id': widget.targetId,
+                      'gateway': selectedGateway,
+                    }),
+                  );
+                },
+        child:
+            isLoading
+                ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                : const Text(
+                  'پرداخت',
+                  style: TextStyle(
+                    color: Colora.scaffold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              )
-            : const Text(
-                'پرداخت',
-                style: TextStyle(
-                  color: Colora.scaffold,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
       ),
     );
   }
 }
-

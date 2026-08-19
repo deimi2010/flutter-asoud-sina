@@ -1,12 +1,11 @@
 import 'package:asood/core/http_client/api_client.dart';
 import 'package:asood/core/http_client/api_status.dart';
-import 'package:dio/dio.dart';
 
 class WalletApiService {
   final DioClient dioClient;
-  
+
   WalletApiService({required this.dioClient});
-  
+
   Future getBalance() async {
     try {
       final res = await dioClient.getData('wallet/balance/');
@@ -15,7 +14,7 @@ class WalletApiService {
       return customApiStatus();
     }
   }
-  
+
   Future checkBalance(double amount) async {
     try {
       final res = await dioClient.postData('wallet/balance/check/', {
@@ -26,7 +25,7 @@ class WalletApiService {
       return customApiStatus();
     }
   }
-  
+
   Future getTransactions() async {
     try {
       final res = await dioClient.getData('wallet/transactions/');
@@ -35,7 +34,7 @@ class WalletApiService {
       return customApiStatus();
     }
   }
-  
+
   Future payWithWallet(Map<String, dynamic> data) async {
     try {
       final res = await dioClient.postData('wallet/pay/', data);
@@ -45,4 +44,3 @@ class WalletApiService {
     }
   }
 }
-

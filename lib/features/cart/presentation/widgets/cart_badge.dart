@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:asood/core/constants/constants.dart';
 import 'package:asood/features/cart/presentation/bloc/cart_bloc.dart';
 
 class CartBadge extends StatelessWidget {
   final Widget child;
 
-  const CartBadge({
-    super.key,
-    required this.child,
-  });
+  const CartBadge({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +34,7 @@ class CartBadge extends StatelessWidget {
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
-                constraints: const BoxConstraints(
-                  minWidth: 16,
-                  minHeight: 16,
-                ),
+                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                 child: Text(
                   itemCount > 99 ? '99+' : itemCount.toString(),
                   style: const TextStyle(
@@ -59,4 +52,3 @@ class CartBadge extends StatelessWidget {
     );
   }
 }
-

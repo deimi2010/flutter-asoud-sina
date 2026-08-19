@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:asood/core/constants/constants.dart';
-import 'package:asood/core/helper/secure_storage.dart';
 import 'package:asood/core/helper/snack_bar_util.dart';
 import 'package:asood/core/http_client/api_status.dart';
 import 'package:asood/core/models/location_model.dart';
@@ -1094,7 +1093,9 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                   // padding: const EdgeInsets.all(0),
                                   child: Transform(
                                     alignment: Alignment.center,
-                                    transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+                                    transform:
+                                        Matrix4.identity()
+                                          ..scale(-1.0, 1.0, 1.0),
                                     child: Icon(
                                       Icons.help_outline,
                                       // Icons.edit,
@@ -1165,7 +1166,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () async{
+                                  onTap: () async {
                                     // Token
                                   },
                                   child: Icon(

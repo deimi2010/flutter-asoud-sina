@@ -64,7 +64,7 @@ class _OrderCardState extends State<OrderCard> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     width: Dimensions.width * 0.9,
                     child: const Divider(thickness: 1),
                   ),

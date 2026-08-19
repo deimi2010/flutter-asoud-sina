@@ -258,7 +258,7 @@ class SendBulkMessage extends StatelessWidget {
 }
 
 class SelectContacts extends StatefulWidget {
-  const SelectContacts({Key? key}) : super(key: key);
+  const SelectContacts({super.key});
 
   @override
   State<SelectContacts> createState() => _SelectContactsState();

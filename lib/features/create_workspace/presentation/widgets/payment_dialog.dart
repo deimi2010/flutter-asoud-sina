@@ -4,7 +4,6 @@ import 'package:asood/core/router/app_routers.dart';
 import 'package:asood/core/widgets/custom_button.dart';
 import 'package:asood/core/widgets/custom_dialog.dart';
 import 'package:asood/core/widgets/custom_textfield.dart';
-import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/vendor/presentation/bloc/workspace/workspace_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,7 +29,7 @@ void paymentDialog(BuildContext context) {
                   CustomDialog(
                     context: context,
                     title: "ثبت درگاه شخصی",
-                    widget: Container(
+                    widget: SizedBox(
                       height: 130,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -132,7 +132,7 @@ class _FeeInquiryScreenState extends State<FeeInquiryScreen> {
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Container(
+                  child: SizedBox(
                     width: Dimensions.width * 0.4,
                     height: 50,
                     child: CustomButton(onPress: () {}, text: "ثبت سفارش"),
