@@ -31,7 +31,11 @@ class Endpoints {
   static String baseMarket = 'owner/market';
   static String ownerMarketList = '$baseMarket/list/';
   static String ownerCreateMarket = '$baseMarket/create/';
+  static String ownerUpdateMarket(String marketId) =>
+      '$baseMarket/update/$marketId/';
   static String ownerCreateMarketContect = '$baseMarket/contact/create/';
+  static String ownerUpdateMarketContact(String marketId) =>
+      '$baseMarket/contact/update/$marketId/';
   static String ownerSlider = '$baseMarket/slider';
   static String ownerDeleteBg = '$baseMarket/background';
   static String ownerTheme = '$baseMarket/theme';
@@ -41,7 +45,13 @@ class Endpoints {
   static String ownerQueue = '$baseMarket/queue';
   static String ownerInactive = '$baseMarket/inactive';
   static String ownerLocationCreate = '$baseMarket/location/create/';
+  static String ownerUpdateMarketLocation(String marketId) =>
+      '$baseMarket/location/update/$marketId/';
   static String ownerCreateSchedule = '$baseMarket/schedules/create/';
+  static String ownerReplaceSchedules = '$baseMarket/schedules/replace/';
+  static String paymentCreate = 'user/payments/create/';
+  static String paymentRedirect(String paymentSessionId) =>
+      '${baseUrl}user/payments/pay?id=$paymentSessionId';
 
   /// Product
   // owner

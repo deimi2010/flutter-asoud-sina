@@ -16,9 +16,26 @@ abstract class CreateMarketRepository {
     String? nationalCode,
   );
 
+  Future<dynamic> updateMarketBase(
+    String marketId,
+    String type,
+    String businessId,
+    String name,
+    String description,
+    String subCategory,
+    String slogan,
+    String? nationalCode,
+  );
+
+  Future<dynamic> createSubscriptionPayment(String marketId);
+
   Future<dynamic> createMarketContact(MarketContactModel marketContact);
 
+  Future<dynamic> updateMarketContact(MarketContactModel marketContact);
+
   Future<dynamic> createMarketLocation(MarketLocationModel marketLocation);
+
+  Future<dynamic> updateMarketLocation(MarketLocationModel marketLocation);
 
   Future<dynamic> getMarketList();
 
@@ -49,4 +66,6 @@ abstract class CreateMarketRepository {
   Future<dynamic> getMarketComments(marketId);
 
   Future<dynamic> createSchedule(scheduleMarketModel);
+
+  Future<dynamic> replaceSchedules(String marketId, List<dynamic> schedules);
 }

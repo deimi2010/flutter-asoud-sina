@@ -1,6 +1,20 @@
 import 'package:pars_validator/pars_validator.dart';
 
 class Validators {
+  static String? businessId(String? value) {
+    final normalized = value?.trim() ?? '';
+    if (normalized.isEmpty) {
+      return "فیلد نمی‌تواند خالی باشد.";
+    }
+    if (!RegExp(r'^[a-z][a-z0-9-]{3,61}[a-z0-9]$').hasMatch(normalized)) {
+      return "شناسه باید ۵ تا ۶۳ کاراکتر انگلیسی، عدد یا خط تیره باشد.";
+    }
+    if (normalized.contains('--')) {
+      return "استفاده از دو خط تیره پشت سر هم مجاز نیست.";
+    }
+    return null;
+  }
+
   static String? simpleFieldEmpty(String? value) {
     if (value == null || value.isEmpty) {
       return "فیلد نمی‌تواند خالی باشد.";
@@ -35,30 +49,22 @@ class Validators {
   }
 
   static String? phoneNumber(String? value, {bool? optional = false}) {
-    if (optional == false) {
-      if (value == null || value.isEmpty) {
-        return "لطفا شماره تلفن را وارد کنید";
-      }
-      bool isValid = Phone.isMobileNumberValid(value);
-
-      if (!isValid) {
-        return "شماره تلفن وارد شده نامعتبر است";
-      }
+    if (value == null || value.isEmpty) {
+      return optional == true ? null : "لطفا شماره تلفن را وارد کنید";
+    }
+    if (!Phone.isMobileNumberValid(value)) {
+      return "شماره تلفن وارد شده نامعتبر است";
     }
 
     return null;
   }
 
   static String? landPhoneNumber(String? value, {bool? optional = false}) {
-    if (optional == false) {
-      if (value == null || value.isEmpty) {
-        return "لطفا شماره تلفن را وارد کنید";
-      }
-      bool isValid = Phone.isLandlineNumberValid(value);
-
-      if (!isValid) {
-        return "شماره تلفن وارد شده نامعتبر است";
-      }
+    if (value == null || value.isEmpty) {
+      return optional == true ? null : "لطفا شماره تلفن را وارد کنید";
+    }
+    if (!Phone.isLandlineNumberValid(value)) {
+      return "شماره تلفن وارد شده نامعتبر است";
     }
     return null;
   }
@@ -91,29 +97,23 @@ class Validators {
   }
 
   static String? email(String? value, {bool? optional = false}) {
-    if (optional == false) {
-      if (value == null || value.isEmpty) {
-        return "لطفاً ایمیل را وارد کنید.";
-      }
-
-      bool isValid = Phone.isEmailValid(value);
-      if (!isValid) {
-        return "ایمیل وارد شده معتبر نیست.";
-      }
+    if (value == null || value.isEmpty) {
+      return optional == true ? null : "لطفاً ایمیل را وارد کنید.";
+    }
+    if (!Phone.isEmailValid(value)) {
+      return "ایمیل وارد شده معتبر نیست.";
     }
     return null;
   }
 
   static String? website(String? value, {bool? optional = false}) {
-    if (optional == false) {
-      if (value == null || value.isEmpty) {
-        return "لطفاً آدرس وب‌سایت را وارد کنید.";
-      }
-      if (!RegExp(
-        r"^(https?:\/\/)?([\w\-]+\.)+[\w\-]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=.]+)?$",
-      ).hasMatch(value)) {
-        return "آدرس وب‌سایت معتبر نیست.";
-      }
+    if (value == null || value.isEmpty) {
+      return optional == true ? null : "لطفاً آدرس وب‌سایت را وارد کنید.";
+    }
+    if (!RegExp(
+      r"^(https?:\/\/)?([\w\-]+\.)+[\w\-]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=.]+)?$",
+    ).hasMatch(value)) {
+      return "آدرس وب‌سایت معتبر نیست.";
     }
     return null;
   }

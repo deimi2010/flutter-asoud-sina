@@ -1,5 +1,28 @@
 part of 'create_workspace_bloc.dart';
 
+enum DraftSaveStatus { idle, saving, saved, failure }
+
+enum RegionLoadStatus {
+  idle,
+  loadingCountries,
+  loadingProvinces,
+  loadingCities,
+  success,
+  failure,
+}
+
+enum WorkspaceSubmitStatus { idle, submitting, success, failure }
+
+enum WorkspaceSyncStatus { localOnly, syncing, synced, failure }
+
+enum SubscriptionPaymentStatus {
+  unpaid,
+  creatingSession,
+  pending,
+  paid,
+  failure,
+}
+
 class CreateWorkSpaceState {
   final String? marketId;
   final String businessId;
@@ -8,12 +31,18 @@ class CreateWorkSpaceState {
   final String description;
   final String subCategory;
   final String slogan;
-  final CWSStatus status;
+  final DraftSaveStatus draftSaveStatus;
+  final RegionLoadStatus regionLoadStatus;
+  final WorkspaceSubmitStatus submitStatus;
+  final WorkspaceSyncStatus syncStatus;
+  final SubscriptionPaymentStatus paymentStatus;
+  final String paymentRedirectUrl;
   final String message;
   final String marketType;
   final String error;
 
   final int activeTabIndex;
+  final Set<int> completedSteps;
 
   //second view
   final String phoneNumber1;
@@ -49,6 +78,8 @@ class CreateWorkSpaceState {
   final List<CountryModel> cityList;
 
   final List<MarketScheduleModel> marketSchedules;
+  final bool isDraftComplete;
+  final bool isDraftLoaded;
 
   const CreateWorkSpaceState({
     required this.marketId,
@@ -70,10 +101,16 @@ class CreateWorkSpaceState {
     required this.slogan,
     required this.hasWorkTime,
     required this.marketType,
-    required this.status,
+    required this.draftSaveStatus,
+    required this.regionLoadStatus,
+    required this.submitStatus,
+    required this.syncStatus,
+    required this.paymentStatus,
+    required this.paymentRedirectUrl,
     required this.message,
     required this.error,
     required this.activeTabIndex,
+    required this.completedSteps,
 
     required this.country,
     required this.countryId,
@@ -93,6 +130,8 @@ class CreateWorkSpaceState {
     required this.provinceList,
     required this.cityList,
     required this.marketSchedules,
+    required this.isDraftComplete,
+    required this.isDraftLoaded,
   });
 
   factory CreateWorkSpaceState.initial() {
@@ -132,10 +171,16 @@ class CreateWorkSpaceState {
       slogan: '',
       activeTabIndex: 0,
       hasWorkTime: false,
-      status: CWSStatus.initial,
+      draftSaveStatus: DraftSaveStatus.idle,
+      regionLoadStatus: RegionLoadStatus.idle,
+      submitStatus: WorkspaceSubmitStatus.idle,
+      syncStatus: WorkspaceSyncStatus.localOnly,
+      paymentStatus: SubscriptionPaymentStatus.unpaid,
+      paymentRedirectUrl: '',
       message: '',
       marketType: 'shop',
       error: '',
+      completedSteps: const {},
       country: '',
       countryId: '',
       city: "",
@@ -154,6 +199,8 @@ class CreateWorkSpaceState {
       provinceList: const [],
       cityList: const [],
       marketSchedules: [],
+      isDraftComplete: false,
+      isDraftLoaded: false,
     );
   }
 
@@ -173,12 +220,18 @@ class CreateWorkSpaceState {
     String? description,
     String? subCategory,
     String? slogan,
-    CWSStatus? status,
+    DraftSaveStatus? draftSaveStatus,
+    RegionLoadStatus? regionLoadStatus,
+    WorkspaceSubmitStatus? submitStatus,
+    WorkspaceSyncStatus? syncStatus,
+    SubscriptionPaymentStatus? paymentStatus,
+    String? paymentRedirectUrl,
     String? message,
     String? marketType,
     String? error,
     bool? hasWorkTime,
     int? activeTabIndex,
+    Set<int>? completedSteps,
     Color? phoneBorder,
     Color? emailBorder,
 
@@ -201,6 +254,8 @@ class CreateWorkSpaceState {
     List<CountryModel>? cityList,
 
     List<MarketScheduleModel>? marketSchedules,
+    bool? isDraftComplete,
+    bool? isDraftLoaded,
   }) {
     return CreateWorkSpaceState(
       marketId: marketId ?? this.marketId,
@@ -220,12 +275,18 @@ class CreateWorkSpaceState {
       description: description ?? this.description,
       subCategory: subCategory ?? this.subCategory,
       slogan: slogan ?? this.slogan,
-      status: status ?? this.status,
+      draftSaveStatus: draftSaveStatus ?? this.draftSaveStatus,
+      regionLoadStatus: regionLoadStatus ?? this.regionLoadStatus,
+      submitStatus: submitStatus ?? this.submitStatus,
+      syncStatus: syncStatus ?? this.syncStatus,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentRedirectUrl: paymentRedirectUrl ?? this.paymentRedirectUrl,
       message: message ?? this.message,
       marketType: marketType ?? this.marketType,
       error: error ?? this.error,
       hasWorkTime: hasWorkTime ?? this.hasWorkTime,
       activeTabIndex: activeTabIndex ?? this.activeTabIndex,
+      completedSteps: completedSteps ?? this.completedSteps,
       country: country ?? this.country,
       countryId: countryId ?? this.countryId,
       city: city ?? this.city,
@@ -244,6 +305,8 @@ class CreateWorkSpaceState {
       provinceList: provinceList ?? this.provinceList,
       cityList: cityList ?? this.cityList,
       marketSchedules: marketSchedules ?? this.marketSchedules,
+      isDraftComplete: isDraftComplete ?? this.isDraftComplete,
+      isDraftLoaded: isDraftLoaded ?? this.isDraftLoaded,
     );
   }
 }

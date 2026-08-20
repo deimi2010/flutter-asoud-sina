@@ -38,6 +38,47 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
     "جمعه": 7,
   };
 
+  @override
+  void initState() {
+    super.initState();
+    for (final day in _weekDays) {
+      _timeRanges[day] = [null, null, null, null];
+    }
+    final bloc = context.read<CreateWorkSpaceBloc>();
+    if (bloc.state.isDraftLoaded) {
+      _restoreSchedules(bloc.state.marketSchedules);
+    } else {
+      bloc.stream.firstWhere((state) => state.isDraftLoaded).then((state) {
+        if (mounted) _restoreSchedules(state.marketSchedules);
+      });
+    }
+  }
+
+  void _restoreSchedules(List<MarketScheduleModel> schedules) {
+    for (final schedule in schedules) {
+      final day =
+          _dayIndexMap.entries
+              .where((entry) => entry.value.toString() == schedule.day)
+              .map((entry) => entry.key)
+              .firstOrNull;
+      if (day == null) continue;
+      final offset = schedule.intervalIndex == 2 ? 2 : 0;
+      _timeRanges[day]![offset] = _parseTime(schedule.start);
+      _timeRanges[day]![offset + 1] = _parseTime(schedule.end);
+    }
+    setState(() {});
+  }
+
+  TimeOfDay? _parseTime(String? value) {
+    if (value == null || value.isEmpty) return null;
+    final parts = value.split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
   String _formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
@@ -59,6 +100,7 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
             market: marketID,
             day: day,
             start: _formatTime(from1),
+            intervalIndex: 1,
             end: to1 != null ? _formatTime(to1) : null,
           ),
         );
@@ -73,6 +115,7 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
             market: marketID,
             day: day,
             start: _formatTime(from2),
+            intervalIndex: 2,
             end: to2 != null ? _formatTime(to2) : null,
           ),
         );
@@ -120,6 +163,7 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
                               market: widget.marketId,
                               day: _dayIndexMap[day]!.toString(),
                               start: _formatTime(from),
+                              intervalIndex: 1,
                               end: null,
                             );
                             BlocProvider.of<CreateWorkSpaceBloc>(
@@ -127,13 +171,19 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
                             ).add(SetMarketScheduleEvent(scheduleModel: model));
                           },
                           (to) {
-                            if (_isToAfterFrom(_timeRanges[day]![0], to)) {
+                            if (_isRangeValid(
+                              day,
+                              1,
+                              _timeRanges[day]![0],
+                              to,
+                            )) {
                               setState(() => _timeRanges[day]![1] = to);
                               final from = _timeRanges[day]![0]!;
                               final model = MarketScheduleModel(
                                 market: widget.marketId,
                                 day: _dayIndexMap[day]!.toString(),
                                 start: _formatTime(from),
+                                intervalIndex: 1,
                                 end: _formatTime(to),
                               );
                               BlocProvider.of<CreateWorkSpaceBloc>(context).add(
@@ -148,6 +198,12 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
                               _timeRanges[day]![0] = null;
                               _timeRanges[day]![1] = null;
                             });
+                            context.read<CreateWorkSpaceBloc>().add(
+                              RemoveMarketScheduleEvent(
+                                day: _dayIndexMap[day]!.toString(),
+                                intervalIndex: 1,
+                              ),
+                            );
                           },
                         ),
 
@@ -155,9 +211,26 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
                         _buildTimeRow(
                           _timeRanges[day]![2],
                           _timeRanges[day]![3],
-                          (from) => setState(() => _timeRanges[day]![2] = from),
+                          (from) {
+                            setState(() => _timeRanges[day]![2] = from);
+                            context.read<CreateWorkSpaceBloc>().add(
+                              SetMarketScheduleEvent(
+                                scheduleModel: MarketScheduleModel(
+                                  market: widget.marketId,
+                                  day: _dayIndexMap[day]!.toString(),
+                                  intervalIndex: 2,
+                                  start: _formatTime(from),
+                                ),
+                              ),
+                            );
+                          },
                           (to) {
-                            if (_isToAfterFrom(_timeRanges[day]![2], to)) {
+                            if (_isRangeValid(
+                              day,
+                              2,
+                              _timeRanges[day]![2],
+                              to,
+                            )) {
                               setState(() => _timeRanges[day]![3] = to);
 
                               final from = _timeRanges[day]![2];
@@ -166,6 +239,7 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
                                   market: widget.marketId,
                                   day: _dayIndexMap[day]!.toString(),
                                   start: _formatTime(from),
+                                  intervalIndex: 2,
                                   end: _formatTime(to),
                                 );
 
@@ -180,11 +254,18 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
                             }
                           },
 
-                          onClear:
-                              () => setState(() {
-                                _timeRanges[day]![2] = null;
-                                _timeRanges[day]![3] = null;
-                              }),
+                          onClear: () {
+                            setState(() {
+                              _timeRanges[day]![2] = null;
+                              _timeRanges[day]![3] = null;
+                            });
+                            context.read<CreateWorkSpaceBloc>().add(
+                              RemoveMarketScheduleEvent(
+                                day: _dayIndexMap[day]!.toString(),
+                                intervalIndex: 2,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -292,10 +373,27 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
     return toMinutes > fromMinutes;
   }
 
+  bool _isRangeValid(
+    String day,
+    int intervalIndex,
+    TimeOfDay? from,
+    TimeOfDay to,
+  ) {
+    if (!_isToAfterFrom(from, to) || from == null) return false;
+    final otherOffset = intervalIndex == 1 ? 2 : 0;
+    final otherStart = _timeRanges[day]![otherOffset];
+    final otherEnd = _timeRanges[day]![otherOffset + 1];
+    if (otherStart == null || otherEnd == null) return true;
+
+    int minutes(TimeOfDay value) => value.hour * 60 + value.minute;
+    return minutes(to) <= minutes(otherStart) ||
+        minutes(from) >= minutes(otherEnd);
+  }
+
   void _showError(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('ساعت پایان باید بعد از ساعت شروع باشد'),
+        content: Text('بازه‌ها باید معتبر و بدون هم‌پوشانی باشند'),
         backgroundColor: Colors.red,
       ),
     );
@@ -421,7 +519,7 @@ void showCustomTimePicker({
                               },
 
                               text:
-                                  state.status == CWSStatus.loading
+                                  state.draftSaveStatus == DraftSaveStatus.saving
                                       ? null
                                       : "تایید",
                               color: Colors.white,
@@ -429,7 +527,7 @@ void showCustomTimePicker({
                               height: 40,
                               width: 100,
                               btnWidget:
-                                  state.status == CWSStatus.loading
+                                  state.draftSaveStatus == DraftSaveStatus.saving
                                       ? const Center(
                                         child: SizedBox(
                                           height: 25,

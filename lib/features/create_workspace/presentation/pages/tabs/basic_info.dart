@@ -1,4 +1,5 @@
 import 'package:asood/core/constants/constants.dart';
+import 'package:asood/core/formatters/lowercase_text_formatter.dart';
 import 'package:asood/core/helper/snack_bar_util.dart';
 import 'package:asood/core/helper/validators.dart';
 import 'package:asood/core/http_client/api_status.dart';
@@ -9,6 +10,7 @@ import 'package:asood/core/widgets/radio_button.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/create_workspace/presentation/widgets/simple_title.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,13 +43,31 @@ class _BasicInfoState extends State<BasicInfo>
   void initState() {
     super.initState();
     catBloc = context.read<CreateWorkSpaceBloc>();
-    catBloc.add(ChangeWorkspaceTabView(activeTabIndex: 0));
-    catBloc.add(
-      ChangeSelectedCategory(
-        selectedCategoryName: 'انتخاب شغل',
-        activeCategoryId: "",
-      ),
-    );
+    if (catBloc.state.isDraftLoaded) {
+      _restoreDraft(catBloc.state);
+    } else {
+      catBloc.stream.firstWhere((state) => state.isDraftLoaded).then((state) {
+        if (mounted) _restoreDraft(state);
+      });
+    }
+  }
+
+  void _restoreDraft(CreateWorkSpaceState state) {
+    businessId.text = state.businessId;
+    name.text = state.name;
+    description.text = state.description;
+    slogan.text = state.slogan;
+    idCode.text = state.idCode;
+  }
+
+  @override
+  void dispose() {
+    businessId.dispose();
+    name.dispose();
+    description.dispose();
+    slogan.dispose();
+    idCode.dispose();
+    super.dispose();
   }
 
   submit() {
@@ -56,11 +76,11 @@ class _BasicInfoState extends State<BasicInfo>
         catBloc.state.activeCategoryId != "") {
       catBloc.add(
         CreateMarket(
-          businessId: businessId.text,
-          name: name.text,
-          description: description.text,
-          slogan: slogan.text,
-          idCode: idCode.text,
+          businessId: businessId.text.trim(),
+          name: name.text.trim(),
+          description: description.text.trim(),
+          slogan: slogan.text.trim(),
+          idCode: idCode.text.trim(),
           marketType: catBloc.state.marketType,
           subCategory: catBloc.state.activeCategoryId,
         ),
@@ -159,8 +179,19 @@ class _BasicInfoState extends State<BasicInfo>
                       text: "شناسه کاربری *",
 
                       // text: isMarketTypeShop ? "شناسه کسب و کار" : "شناسه شرکت",
-                      validator: Validators.simpleFieldEmpty,
+                      validator: Validators.businessId,
                       keyboardType: TextInputType.visiblePassword,
+                      textDirection: TextDirection.ltr,
+                      inputFormatters: [
+                        const LowerCaseTextFormatter(),
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9-]'),
+                        ),
+                      ],
+                      onChanged:
+                          (value) => catBloc.add(
+                            UpdateWorkspaceDraft(businessId: value),
+                          ),
                       // inputFormatters: <TextInputFormatter>[
                       //   FilteringTextInputFormatter.allow(RegExp('[0-9۰-۹]')),
                       // ],
@@ -177,33 +208,44 @@ class _BasicInfoState extends State<BasicInfo>
                       controller: name,
                       text: isMarketTypeShop ? "نام کسب و کار *" : "نام شرکت *",
                       validator: Validators.simpleFieldEmpty,
+                      keyboardType: TextInputType.name,
+                      onChanged:
+                          (value) =>
+                              catBloc.add(UpdateWorkspaceDraft(name: value)),
                     ),
                     const SizedBox(height: 7),
                     CustomTextField(
-                      isRequired: true,
                       controller: description,
                       text: "توضیحات",
                       maxLine: 6,
-                      validator: Validators.simpleFieldEmpty,
+                      onChanged:
+                          (value) => catBloc.add(
+                            UpdateWorkspaceDraft(description: value),
+                          ),
                     ),
                     const SizedBox(height: 7),
                     CustomTextField(
-                      isRequired: true,
                       controller: slogan,
                       text: "شعار تبلیغاتی",
                       // text: isMarketTypeShop ? "شعار تبلیغاتی" : "شعار شرکت",
-                      validator: Validators.simpleFieldEmpty,
+                      onChanged:
+                          (value) =>
+                              catBloc.add(UpdateWorkspaceDraft(slogan: value)),
                     ),
                     const SizedBox(height: 7),
                     CustomTextField(
                       maxLength: isMarketTypeShop ? 10 : 11,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: idCode,
                       text: isMarketTypeShop ? "کد ملی *" : "شناسه ملی *",
                       validator:
                           isMarketTypeShop
                               ? Validators.iranianNationalCodeValidator
                               : Validators.companyValidation,
+                      onChanged:
+                          (value) =>
+                              catBloc.add(UpdateWorkspaceDraft(idCode: value)),
                     ),
                     const Padding(
                       padding: EdgeInsets.all(8.0),
@@ -231,11 +273,13 @@ class _BasicInfoState extends State<BasicInfo>
                               );
 
                               if (result is Map<String, String>) {
-                                ChangeSelectedCategory(
-                                  selectedCategoryName:
-                                      result['selectedCategoryName'] ?? '',
-                                  activeCategoryId:
-                                      result['selectedCategoryId'] ?? '',
+                                context.read<CreateWorkSpaceBloc>().add(
+                                  ChangeSelectedCategory(
+                                    selectedCategoryName:
+                                        result['selectedCategoryName'] ?? '',
+                                    activeCategoryId:
+                                        result['selectedCategoryId'] ?? '',
+                                  ),
                                 );
                               }
                             },
@@ -276,8 +320,8 @@ class _BasicInfoState extends State<BasicInfo>
                                   text:
                                       BlocProvider.of<CreateWorkSpaceBloc>(
                                                 context,
-                                              ).state.status ==
-                                              CWSStatus.loading
+                                              ).state.syncStatus ==
+                                              WorkspaceSyncStatus.syncing
                                           ? null
                                           : "ویرایش",
                                   color: Colors.white,
@@ -287,8 +331,8 @@ class _BasicInfoState extends State<BasicInfo>
                                   btnWidget:
                                       BlocProvider.of<CreateWorkSpaceBloc>(
                                                 context,
-                                              ).state.status ==
-                                              CWSStatus.loading
+                                              ).state.syncStatus ==
+                                              WorkspaceSyncStatus.syncing
                                           ? const Center(
                                             child: SizedBox(
                                               height: 25,
@@ -304,8 +348,8 @@ class _BasicInfoState extends State<BasicInfo>
                                   text:
                                       BlocProvider.of<CreateWorkSpaceBloc>(
                                                 context,
-                                              ).state.status ==
-                                              CWSStatus.loading
+                                              ).state.syncStatus ==
+                                              WorkspaceSyncStatus.syncing
                                           ? null
                                           : "بعدی",
                                   color: Colors.white,
@@ -315,8 +359,8 @@ class _BasicInfoState extends State<BasicInfo>
                                   btnWidget:
                                       BlocProvider.of<CreateWorkSpaceBloc>(
                                                 context,
-                                              ).state.status ==
-                                              CWSStatus.loading
+                                              ).state.syncStatus ==
+                                              WorkspaceSyncStatus.syncing
                                           ? const Center(
                                             child: SizedBox(
                                               height: 25,

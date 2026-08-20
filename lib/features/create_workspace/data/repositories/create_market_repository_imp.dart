@@ -34,13 +34,51 @@ class CreateMarketRepositoryImp implements CreateMarketRepository {
   }
 
   @override
+  Future updateMarketBase(
+    String marketId,
+    String type,
+    String businessId,
+    String name,
+    String description,
+    String subCategory,
+    String slogan,
+    String? nationalCode,
+  ) {
+    return marketApiService.updateMarketBase(
+      marketId,
+      type,
+      businessId,
+      name,
+      description,
+      subCategory,
+      slogan,
+      nationalCode,
+    );
+  }
+
+  @override
+  Future createSubscriptionPayment(String marketId) {
+    return marketApiService.createSubscriptionPayment(marketId);
+  }
+
+  @override
   Future createMarketContact(MarketContactModel marketContact) async {
     return await marketApiService.createMarketContact(marketContact);
   }
 
   @override
+  Future updateMarketContact(MarketContactModel marketContact) async {
+    return marketApiService.updateMarketContact(marketContact);
+  }
+
+  @override
   Future createMarketLocation(MarketLocationModel marketLocation) async {
     return await marketApiService.createMarketLocation(marketLocation);
+  }
+
+  @override
+  Future updateMarketLocation(MarketLocationModel marketLocation) async {
+    return marketApiService.updateMarketLocation(marketLocation);
   }
 
   @override
@@ -116,5 +154,10 @@ class CreateMarketRepositoryImp implements CreateMarketRepository {
   @override
   Future createSchedule(scheduleMarketModel) async {
     return await marketApiService.setSchedule(scheduleMarketModel);
+  }
+
+  @override
+  Future replaceSchedules(String marketId, List<dynamic> schedules) {
+    return marketApiService.replaceSchedules(marketId, schedules);
   }
 }

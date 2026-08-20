@@ -50,7 +50,7 @@ class _CreateWorkSpaceScreenState extends State<CreateWorkSpaceScreen>
     var bloc = context.read<CreateWorkSpaceBloc>();
     int index = bloc.state.activeTabIndex;
     if (index > 0) {
-      bloc.add(ChangeWorkspaceTabView(activeTabIndex: index - 1));
+      bloc.add(const PreviousWorkspaceStep());
     } else if (index == 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         context.pop();
@@ -77,7 +77,11 @@ class _CreateWorkSpaceScreenState extends State<CreateWorkSpaceScreen>
                   _tabController.index = state.activeTabIndex;
                 }
 
-                if (state.status == CWSStatus.failure) {
+                if (state.draftSaveStatus == DraftSaveStatus.failure ||
+                    state.regionLoadStatus == RegionLoadStatus.failure ||
+                    state.submitStatus == WorkspaceSubmitStatus.failure ||
+                    state.syncStatus == WorkspaceSyncStatus.failure ||
+                    state.paymentStatus == SubscriptionPaymentStatus.failure) {
                   showSnackBar(context, "مشکلی پیش آمده مجددا تلاش کنید");
                 }
               },
@@ -191,7 +195,11 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   _StickyTabBarDelegate({required this.child});
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return child;
   }
 

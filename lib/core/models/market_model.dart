@@ -7,6 +7,7 @@ class MarketModel {
   String? subCategory;
   String? subCategoryTitle;
   String? status;
+  String? statusReason;
   bool? isPaid;
   String? createdAt;
   String? inactiveUrl;
@@ -23,6 +24,7 @@ class MarketModel {
     this.subCategory,
     this.subCategoryTitle,
     this.status,
+    this.statusReason,
     this.isPaid,
     this.createdAt,
     this.inactiveUrl,
@@ -39,6 +41,7 @@ class MarketModel {
     subCategory = json['sub_category'];
     subCategoryTitle = json['sub_category_title'];
     status = json['status'];
+    statusReason = json['status_reason'];
     isPaid = json['is_paid'];
     createdAt = json['created_at'];
     inactiveUrl = json['inactive_url'];
@@ -56,6 +59,7 @@ class MarketModel {
     data['sub_category'] = subCategory;
     data['sub_category_title'] = subCategoryTitle;
     data['status'] = status;
+    data['status_reason'] = statusReason;
     data['is_paid'] = isPaid;
     data['created_at'] = createdAt;
     data['inactive_url'] = inactiveUrl;

@@ -10,6 +10,9 @@ import 'package:asood/features/create_workspace/presentation/widgets/location_di
 import 'package:asood/features/create_workspace/presentation/widgets/payment_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+enum _LocationSelection { country, province, city }
 
 class LocationInfo extends StatefulWidget {
   final CreateWorkSpaceBloc bloc;
@@ -26,13 +29,26 @@ class _LocationInfoState extends State<LocationInfo> {
   final zipCodeController = TextEditingController();
 
   late CreateWorkSpaceBloc bloc;
+  bool _waitingForDraftCompletion = false;
+  _LocationSelection? _pendingSelection;
+  String _openedPaymentUrl = '';
 
   @override
   void initState() {
     super.initState();
     bloc = BlocProvider.of<CreateWorkSpaceBloc>(context);
+    void restore(CreateWorkSpaceState state) {
+      addressController.text = state.address;
+      zipCodeController.text = state.postalCode;
+    }
 
-    bloc.add(LoadCountry());
+    if (bloc.state.isDraftLoaded) {
+      restore(bloc.state);
+    } else {
+      bloc.stream.firstWhere((state) => state.isDraftLoaded).then((state) {
+        if (mounted) restore(state);
+      });
+    }
   }
 
   @override
@@ -40,6 +56,62 @@ class _LocationInfoState extends State<LocationInfo> {
     addressController.dispose();
     zipCodeController.dispose();
     super.dispose();
+  }
+
+  void _showLocationSelector(
+    BuildContext context,
+    CreateWorkSpaceState state,
+    _LocationSelection selection,
+  ) {
+    final title = switch (selection) {
+      _LocationSelection.country => 'کشور',
+      _LocationSelection.province => 'استان',
+      _LocationSelection.city => 'شهر',
+    };
+    final items = switch (selection) {
+      _LocationSelection.country => state.countryList,
+      _LocationSelection.province => state.provinceList,
+      _LocationSelection.city => state.cityList,
+    };
+
+    LocationDialog.showLocationSelector(
+      title: title,
+      context: context,
+      items: items,
+      getName: (item) => item.name ?? '',
+      getId: (item) => item.id,
+      onSelect: (item) {
+        switch (selection) {
+          case _LocationSelection.country:
+            bloc.add(
+              ChangeLocDataEvent(
+                country: item.name ?? '',
+                countryId: item.id ?? '',
+                province: '',
+                provinceId: '',
+                city: '',
+                cityId: '',
+              ),
+            );
+            return;
+          case _LocationSelection.province:
+            bloc.add(
+              ChangeLocDataEvent(
+                province: item.name ?? '',
+                provinceId: item.id ?? '',
+                city: '',
+                cityId: '',
+              ),
+            );
+            return;
+          case _LocationSelection.city:
+            bloc.add(
+              ChangeLocDataEvent(city: item.name ?? '', cityId: item.id ?? ''),
+            );
+            return;
+        }
+      },
+    );
   }
 
   @override
@@ -56,7 +128,29 @@ class _LocationInfoState extends State<LocationInfo> {
                 borderRadius: BorderRadius.circular(20),
                 color: Colora.primaryColor,
               ),
-              child: BlocBuilder<CreateWorkSpaceBloc, CreateWorkSpaceState>(
+              child: BlocConsumer<CreateWorkSpaceBloc, CreateWorkSpaceState>(
+                listener: (context, state) {
+                  if (_waitingForDraftCompletion && state.isDraftComplete) {
+                    _waitingForDraftCompletion = false;
+                    paymentDialog(context);
+                  }
+                  if (state.regionLoadStatus == RegionLoadStatus.success &&
+                      _pendingSelection != null) {
+                    final selection = _pendingSelection!;
+                    _pendingSelection = null;
+                    _showLocationSelector(context, state, selection);
+                  }
+                  if (state.paymentStatus ==
+                          SubscriptionPaymentStatus.pending &&
+                      state.paymentRedirectUrl.isNotEmpty &&
+                      state.paymentRedirectUrl != _openedPaymentUrl) {
+                    _openedPaymentUrl = state.paymentRedirectUrl;
+                    launchUrl(
+                      Uri.parse(state.paymentRedirectUrl),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  }
+                },
                 builder: (context, state) {
                   return Form(
                     key: _formKey,
@@ -66,31 +160,15 @@ class _LocationInfoState extends State<LocationInfo> {
                         const SizedBox(height: 15),
                         CustomButton(
                           onPress: () {
-                            widget.bloc.add(LoadCountry());
-                            if (state.status == CWSStatus.success) {
-                              LocationDialog.showLocationSelector(
-                                title: "کشور",
-                                context: context,
-                                items: bloc.state.countryList,
-                                getName: (item) => item.name ?? '',
-                                getId: (item) => item.id,
-                                onLoad: () {
-                                  bloc.add(
-                                    ChangeLocDataEvent(
-                                      province: "",
-                                      provinceId: "",
-                                    ),
-                                  );
-                                },
-                                onSelect: (item) {
-                                  bloc.add(
-                                    ChangeLocDataEvent(
-                                      country: item.name!,
-                                      countryId: item.id!,
-                                    ),
-                                  );
-                                },
+                            if (state.countryList.isNotEmpty) {
+                              _showLocationSelector(
+                                context,
+                                state,
+                                _LocationSelection.country,
                               );
+                            } else {
+                              _pendingSelection = _LocationSelection.country;
+                              widget.bloc.add(LoadCountry());
                             }
                           },
                           width: Dimensions.width * 0.88,
@@ -110,36 +188,17 @@ class _LocationInfoState extends State<LocationInfo> {
                                 context,
                                 "لطفا ابتدا کشور را انتخاب کنید",
                               );
-                            } else if (state.status == CWSStatus.success) {
+                            } else if (state.provinceList.isNotEmpty) {
+                              _showLocationSelector(
+                                context,
+                                state,
+                                _LocationSelection.province,
+                              );
+                            } else {
+                              _pendingSelection = _LocationSelection.province;
                               widget.bloc.add(
                                 LoadProvince(countryId: state.countryId),
                               );
-                              if (state.provinceList.isNotEmpty) {
-                                LocationDialog.showLocationSelector(
-                                  title: "استان",
-                                  context: context,
-                                  onLoad: () {
-                                    bloc.add(
-                                      ChangeLocDataEvent(
-                                        province: "",
-                                        provinceId: "",
-                                      ),
-                                    );
-                                  },
-                                  items: bloc.state.provinceList,
-                                  getName: (item) => item.name ?? '',
-                                  getId: (item) => item.id,
-
-                                  onSelect: (item) {
-                                    bloc.add(
-                                      ChangeLocDataEvent(
-                                        province: item.name!,
-                                        provinceId: item.id!,
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
                             }
                           },
                           width: Dimensions.width * 0.88,
@@ -160,32 +219,17 @@ class _LocationInfoState extends State<LocationInfo> {
                                 context,
                                 "لطفا ابتدا استان را انتخاب کنید",
                               );
-                            } else if (state.status == CWSStatus.success) {
+                            } else if (state.cityList.isNotEmpty) {
+                              _showLocationSelector(
+                                context,
+                                state,
+                                _LocationSelection.city,
+                              );
+                            } else {
+                              _pendingSelection = _LocationSelection.city;
                               widget.bloc.add(
                                 LoadCity(provinceId: state.provinceId),
                               );
-                              if (state.cityList.isNotEmpty) {
-                                LocationDialog.showLocationSelector(
-                                  title: "شهر",
-                                  context: context,
-                                  onLoad: () {
-                                    bloc.add(
-                                      ChangeLocDataEvent(city: "", cityId: ""),
-                                    );
-                                  },
-                                  items: bloc.state.cityList,
-                                  getName: (item) => item.name ?? '',
-                                  getId: (item) => item.id,
-                                  onSelect: (item) {
-                                    bloc.add(
-                                      ChangeLocDataEvent(
-                                        city: item.name!,
-                                        cityId: item.id!,
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
                             }
                           },
                           width: Dimensions.width * 0.88,
@@ -201,6 +245,11 @@ class _LocationInfoState extends State<LocationInfo> {
                           maxLine: 6,
                           controller: addressController,
                           text: "آدرس فروشگاه",
+                          keyboardType: TextInputType.streetAddress,
+                          onChanged:
+                              (value) => bloc.add(
+                                UpdateWorkspaceDraft(address: value),
+                              ),
                         ),
                         const SizedBox(height: 7),
 
@@ -210,6 +259,11 @@ class _LocationInfoState extends State<LocationInfo> {
                           text: "کد پستی",
                           maxLength: 10,
                           validator: Validators.post,
+                          keyboardType: TextInputType.number,
+                          onChanged:
+                              (value) => bloc.add(
+                                UpdateWorkspaceDraft(postalCode: value),
+                              ),
                         ),
 
                         //location picker
@@ -253,7 +307,7 @@ class _LocationInfoState extends State<LocationInfo> {
                                   width: 100,
                                   onPress: () {
                                     widget.bloc.add(
-                                      ChangeWorkspaceTabView(activeTabIndex: 1),
+                                      const PreviousWorkspaceStep(),
                                     );
                                   },
                                   text: "قبلی",
@@ -283,14 +337,15 @@ class _LocationInfoState extends State<LocationInfo> {
                                         "لوکیشن را انتخاب کنید",
                                       );
                                     } else {
+                                      _waitingForDraftCompletion = true;
                                       widget.bloc.add(
-                                        SaveMarketLocationEvent(),
+                                        SaveMarketLocationEvent(
+                                          address:
+                                              addressController.text.trim(),
+                                          postalCode:
+                                              zipCodeController.text.trim(),
+                                        ),
                                       );
-
-                                      if (widget.bloc.state.status ==
-                                          CWSStatus.success) {
-                                        paymentDialog(context);
-                                      }
                                     }
                                   },
                                   text: "ثبت",

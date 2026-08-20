@@ -38,7 +38,7 @@ class LocationDialog {
           backgroundColor: Colora.primaryColor,
           content: BlocBuilder<CreateWorkSpaceBloc, CreateWorkSpaceState>(
             builder: (context, state) {
-              if (state.status == CWSStatus.success) {
+              if (state.regionLoadStatus == RegionLoadStatus.success) {
                 return Container(
                   width: Dimensions.width * 0.7,
                   height: Dimensions.height * 0.5,
@@ -76,7 +76,11 @@ class LocationDialog {
                     },
                   ),
                 );
-              } else if (state.status == CWSStatus.loading) {
+              } else if ({
+                RegionLoadStatus.loadingCountries,
+                RegionLoadStatus.loadingProvinces,
+                RegionLoadStatus.loadingCities,
+              }.contains(state.regionLoadStatus)) {
                 return SizedBox(
                   width: Dimensions.width * 0.7,
                   height: Dimensions.height * 0.5,

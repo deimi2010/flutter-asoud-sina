@@ -14,6 +14,31 @@ class CreateMarketApiService {
   DioClient dioClient;
   CreateMarketApiService({required this.dioClient});
 
+  dynamic _failureFrom(Object error) {
+    if (error is DioException && error.response != null) {
+      return apiStatus(error.response!);
+    }
+    return customApiStatus();
+  }
+
+  Map<String, dynamic> _marketBody(
+    String type,
+    String businessId,
+    String name,
+    String description,
+    String subCategory,
+    String slogan,
+    String? nationalCode,
+  ) => {
+    'type': type,
+    'business_id': businessId,
+    'name': name,
+    'description': description,
+    'sub_category': subCategory,
+    'slogan': slogan,
+    'national_code': nationalCode ?? '',
+  };
+
   // Create market base
   Future createMarketBase(
     String type,
@@ -24,30 +49,71 @@ class CreateMarketApiService {
     String slogan,
     String? nationalCode,
   ) async {
-    var body = {
-      "type": type,
-      "business_id": businessId,
-      "name": name,
-      "description": description,
-      "sub_category": subCategory,
-      "slogan": slogan,
-      "national_code": nationalCode ?? "",
-      "payment_gateway_type": "asoud",
-    };
+    final body = _marketBody(
+      type,
+      businessId,
+      name,
+      description,
+      subCategory,
+      slogan,
+      nationalCode,
+    );
     try {
       Response res = await dioClient.postData(
         Endpoints.ownerCreateMarket,
         body,
       );
       return apiStatus(res);
-    } catch (e) {
-      return customApiStatus();
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future updateMarketBase(
+    String marketId,
+    String type,
+    String businessId,
+    String name,
+    String description,
+    String subCategory,
+    String slogan,
+    String? nationalCode,
+  ) async {
+    try {
+      final response = await dioClient.putData(
+        Endpoints.ownerUpdateMarket(marketId),
+        _marketBody(
+          type,
+          businessId,
+          name,
+          description,
+          subCategory,
+          slogan,
+          nationalCode,
+        ),
+      );
+      return apiStatus(response);
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future createSubscriptionPayment(String marketId) async {
+    try {
+      final response = await dioClient.postData(Endpoints.paymentCreate, {
+        'target': 'market_subscription',
+        'target_id': marketId,
+        'gateway': 'zarinpal',
+      });
+      return apiStatus(response);
+    } catch (error) {
+      return _failureFrom(error);
     }
   }
 
   // Create contact information
   Future createMarketContact(MarketContactModel marketContact) async {
-    var body = {
+    final body = {
       "market": marketContact.market,
       "first_mobile_number": marketContact.firstMobileNumber,
       "second_mobile_number": marketContact.secondMobileNumber,
@@ -56,7 +122,7 @@ class CreateMarketApiService {
       "email": marketContact.email,
       "website_url": marketContact.websiteUrl,
 
-      "telegram_id": marketContact.messengerIds.telegram,
+      "messenger_ids": marketContact.messengerIds.toJson(),
     };
 
     try {
@@ -65,8 +131,20 @@ class CreateMarketApiService {
         body,
       );
       return apiStatus(res);
-    } catch (e) {
-      return customApiStatus();
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future updateMarketContact(MarketContactModel marketContact) async {
+    try {
+      final response = await dioClient.putData(
+        Endpoints.ownerUpdateMarketContact(marketContact.market),
+        marketContact.toJson()..remove('market'),
+      );
+      return apiStatus(response);
+    } catch (error) {
+      return _failureFrom(error);
     }
   }
 
@@ -87,8 +165,21 @@ class CreateMarketApiService {
         body,
       );
       return apiStatus(res);
-    } catch (e) {
-      return customApiStatus();
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future updateMarketLocation(MarketLocationModel marketLocation) async {
+    try {
+      final body = marketLocation.toJson()..remove('market');
+      final response = await dioClient.putData(
+        Endpoints.ownerUpdateMarketLocation(marketLocation.market!),
+        body,
+      );
+      return apiStatus(response);
+    } catch (error) {
+      return _failureFrom(error);
     }
   }
 
@@ -106,8 +197,9 @@ class CreateMarketApiService {
   // Inactive market
   Future inactiveMarket(String marketId) async {
     try {
-      Response res = await dioClient.getData(
+      Response res = await dioClient.postData(
         "${Endpoints.ownerInactive}/$marketId/",
+        const <String, dynamic>{},
       );
       return apiStatus(res);
     } catch (e) {
@@ -118,8 +210,9 @@ class CreateMarketApiService {
   // Queue market
   Future queueMarket(String marketId) async {
     try {
-      Response res = await dioClient.getData(
+      Response res = await dioClient.postData(
         "${Endpoints.ownerQueue}/$marketId/",
+        const <String, dynamic>{},
       );
       return apiStatus(res);
     } catch (e) {
@@ -290,8 +383,20 @@ class CreateMarketApiService {
         marketSchedule.toJson(),
       );
       return apiStatus(res);
-    } catch (e) {
-      return customApiStatus();
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future replaceSchedules(String marketId, List<dynamic> schedules) async {
+    try {
+      final response = await dioClient.putData(
+        Endpoints.ownerReplaceSchedules,
+        {'market': marketId, 'schedules': schedules},
+      );
+      return apiStatus(response);
+    } catch (error) {
+      return _failureFrom(error);
     }
   }
 }

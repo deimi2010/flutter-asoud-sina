@@ -4,6 +4,50 @@ class CreateWorkSpaceEvent {
   const CreateWorkSpaceEvent();
 }
 
+class LoadWorkspaceDraft extends CreateWorkSpaceEvent {
+  const LoadWorkspaceDraft();
+}
+
+class PersistWorkspaceDraft extends CreateWorkSpaceEvent {
+  const PersistWorkspaceDraft();
+}
+
+class PreviousWorkspaceStep extends CreateWorkSpaceEvent {
+  const PreviousWorkspaceStep();
+}
+
+class UpdateWorkspaceDraft extends CreateWorkSpaceEvent {
+  const UpdateWorkspaceDraft({
+    this.businessId,
+    this.name,
+    this.description,
+    this.slogan,
+    this.idCode,
+    this.phoneNumber1,
+    this.phoneNumber2,
+    this.telephone,
+    this.fax,
+    this.email,
+    this.websiteUrl,
+    this.address,
+    this.postalCode,
+  });
+
+  final String? businessId;
+  final String? name;
+  final String? description;
+  final String? slogan;
+  final String? idCode;
+  final String? phoneNumber1;
+  final String? phoneNumber2;
+  final String? telephone;
+  final String? fax;
+  final String? email;
+  final String? websiteUrl;
+  final String? address;
+  final String? postalCode;
+}
+
 //first View Event
 class CreateMarket extends CreateWorkSpaceEvent {
   final String marketType;
@@ -52,7 +96,13 @@ class MarketContact extends CreateWorkSpaceEvent {
 
 //third View Event
 class SaveMarketLocationEvent extends CreateWorkSpaceEvent {
-  const SaveMarketLocationEvent();
+  final String address;
+  final String postalCode;
+
+  const SaveMarketLocationEvent({
+    required this.address,
+    required this.postalCode,
+  });
 }
 
 /// update user social ids
@@ -126,6 +176,10 @@ class SetDiscount extends CreateWorkSpaceEvent {
 
 class PayPrice extends CreateWorkSpaceEvent {}
 
+class StartSubscriptionPayment extends CreateWorkSpaceEvent {
+  const StartSubscriptionPayment();
+}
+
 //region
 class LoadCountry extends CreateWorkSpaceEvent {}
 
@@ -142,4 +196,14 @@ class LoadCity extends CreateWorkSpaceEvent {
 class SetMarketScheduleEvent extends CreateWorkSpaceEvent {
   final MarketScheduleModel scheduleModel;
   const SetMarketScheduleEvent({required this.scheduleModel});
+}
+
+class RemoveMarketScheduleEvent extends CreateWorkSpaceEvent {
+  const RemoveMarketScheduleEvent({
+    required this.day,
+    required this.intervalIndex,
+  });
+
+  final String day;
+  final int intervalIndex;
 }

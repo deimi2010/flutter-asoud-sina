@@ -27,6 +27,7 @@ class CustomTextField extends StatefulWidget {
     this.inputFormatters,
     this.enabled = true,
     this.onChanged,
+    this.textDirection = TextDirection.rtl,
   });
 
   final TextEditingController controller;
@@ -51,6 +52,7 @@ class CustomTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final bool enabled;
   final Function(String)? onChanged;
+  final TextDirection textDirection;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -97,7 +99,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         builder: (context, borderColor, child) {
           return TextFormField(
             maxLength: widget.maxLength,
-            textDirection: TextDirection.rtl,
+            textDirection: widget.textDirection,
             controller: widget.controller,
             keyboardType: widget.keyboardType,
             textInputAction: TextInputAction.next,

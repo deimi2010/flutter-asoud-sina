@@ -4,6 +4,7 @@ import 'package:asood/core/storage/token_storage.dart';
 import 'package:asood/features/auth/domain/repositories/auth_repository.dart';
 import 'package:asood/features/cart/presentation/bloc/cart_bloc.dart';
 import 'package:asood/features/create_workspace/domain/repositories/create_market_repository.dart';
+import 'package:asood/features/create_workspace/domain/repositories/workspace_draft_repository.dart';
 import 'package:asood/features/market/domain/repository/product_repository.dart';
 import 'package:asood/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:asood/features/wallet/presentation/bloc/wallet_bloc.dart';
@@ -22,6 +23,7 @@ void main() {
     expect(locator.isRegistered<DioClient>(), isTrue);
     expect(locator.isRegistered<AuthRepository>(), isTrue);
     expect(locator.isRegistered<CreateMarketRepository>(), isTrue);
+    expect(locator.isRegistered<WorkspaceDraftRepository>(), isTrue);
     expect(locator.isRegistered<ProductRepository>(), isTrue);
     expect(locator.isRegistered<CartBloc>(), isTrue);
     expect(locator.isRegistered<WalletBloc>(), isTrue);

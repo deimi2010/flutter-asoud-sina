@@ -6,6 +6,7 @@ import 'package:asood/features/create_workspace/presentation/widgets/custom_swit
 import 'package:asood/features/create_workspace/presentation/widgets/socialmedia_listbuilder.dart';
 import 'package:asood/features/create_workspace/presentation/widgets/socialmedia_selector.dart';
 import 'package:asood/features/create_workspace/presentation/widgets/weekday_opentime.dart';
+import 'package:asood/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:asood/core/constants/constants.dart';
@@ -59,6 +60,47 @@ class _ContactsInfoState extends State<ContactsInfo>
   TextEditingController friTController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    final workspaceBloc = context.read<CreateWorkSpaceBloc>();
+    void restore(CreateWorkSpaceState state) {
+      phone1Controller.text =
+          state.phoneNumber1.isNotEmpty
+              ? state.phoneNumber1
+              : context.read<AuthBloc>().state.phoneNumber;
+      phone2Controller.text = state.phoneNumber2;
+      phoneNumberController.text = state.telephone;
+      faxController.text = state.fax;
+      emailController.text = state.email;
+      siteController.text = state.websiteUrl;
+    }
+
+    if (workspaceBloc.state.isDraftLoaded) {
+      restore(workspaceBloc.state);
+    } else {
+      workspaceBloc.stream.firstWhere((state) => state.isDraftLoaded).then((
+        state,
+      ) {
+        if (mounted) restore(state);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    phone1Controller.dispose();
+    phone2Controller.dispose();
+    phoneNumberController.dispose();
+    faxController.dispose();
+    emailController.dispose();
+    siteController.dispose();
+    telegramController.dispose();
+    instaController.dispose();
+    super.dispose();
+  }
+
   List<MapEntry<String, String>> messengerListFromIds(MessengerIds ids) {
     return {
           'telegram': ids.telegram,
@@ -73,30 +115,26 @@ class _ContactsInfoState extends State<ContactsInfo>
 
   submit() {
     bool isEmptySchedule = false;
-    if (widget.bloc.state.hasWorkTime == true &&
-        widget.bloc.state.marketSchedules.isNotEmpty) {
-      isEmptySchedule = false;
-    } else if (widget.bloc.state.hasWorkTime == true &&
-        widget.bloc.state.marketSchedules.isEmpty) {
-      isEmptySchedule = true;
+    if (widget.bloc.state.hasWorkTime) {
+      isEmptySchedule =
+          widget.bloc.state.marketSchedules.isEmpty ||
+          widget.bloc.state.marketSchedules.any(
+            (schedule) => schedule.end == null || schedule.end!.isEmpty,
+          );
     }
-    print("onsubmit ----------");
-    print(isEmptySchedule);
     if (_formKey.currentState!.validate() && isEmptySchedule == false) {
       widget.bloc.add(
         MarketContact(
           marketId: widget.bloc.state.marketId!,
-          phoneNumber1: phone1Controller.text,
-          phoneNumber2: phone1Controller.text,
-          telephone: phoneNumberController.text,
-          fax: faxController.text,
-          email: emailController.text,
-          websiteUrl: siteController.text,
-          messengerIds: MessengerIds(),
+          phoneNumber1: phone1Controller.text.trim(),
+          phoneNumber2: phone2Controller.text.trim(),
+          telephone: phoneNumberController.text.trim(),
+          fax: faxController.text.trim(),
+          email: emailController.text.trim(),
+          websiteUrl: siteController.text.trim(),
+          messengerIds: widget.bloc.state.messengerIds,
         ),
       );
-
-      widget.bloc.add(ChangeWorkspaceTabView(activeTabIndex: 1));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -139,6 +177,10 @@ class _ContactsInfoState extends State<ContactsInfo>
                   text: "شماره همراه 1",
                   maxLength: 11,
                   validator: (p0) => Validators.phoneNumber(p0),
+                  onChanged:
+                      (value) => widget.bloc.add(
+                        UpdateWorkspaceDraft(phoneNumber1: value),
+                      ),
                 ),
                 const SizedBox(height: 7),
                 CustomTextField(
@@ -147,15 +189,23 @@ class _ContactsInfoState extends State<ContactsInfo>
                   maxLength: 11,
                   keyboardType: TextInputType.phone,
                   validator: (p0) => Validators.phoneNumber(p0, optional: true),
+                  onChanged:
+                      (value) => widget.bloc.add(
+                        UpdateWorkspaceDraft(phoneNumber2: value),
+                      ),
                 ),
                 const SizedBox(height: 7),
                 CustomTextField(
-                  isRequired: true,
                   controller: phoneNumberController,
                   text: "تلفن ثابت",
                   maxLength: 11,
                   keyboardType: TextInputType.phone,
-                  validator: (p0) => Validators.landPhoneNumber(p0),
+                  validator:
+                      (p0) => Validators.landPhoneNumber(p0, optional: true),
+                  onChanged:
+                      (value) => widget.bloc.add(
+                        UpdateWorkspaceDraft(telephone: value),
+                      ),
                 ),
                 const SizedBox(height: 7),
                 CustomTextField(
@@ -164,22 +214,33 @@ class _ContactsInfoState extends State<ContactsInfo>
                   maxLength: 11,
                   keyboardType: TextInputType.phone,
                   validator: (p0) => Validators.fax(p0, optional: true),
+                  onChanged:
+                      (value) =>
+                          widget.bloc.add(UpdateWorkspaceDraft(fax: value)),
                 ),
                 const SizedBox(height: 7),
                 CustomTextField(
                   borderColor: widget.bloc.state.emailBorder,
-                  isRequired: true,
                   controller: emailController,
                   text: "ایمیل",
-                  validator: Validators.email,
+                  validator: (p0) => Validators.email(p0, optional: true),
                   keyboardType: TextInputType.emailAddress,
+                  textDirection: TextDirection.ltr,
+                  onChanged:
+                      (value) =>
+                          widget.bloc.add(UpdateWorkspaceDraft(email: value)),
                 ),
                 const SizedBox(height: 7),
                 CustomTextField(
                   controller: siteController,
                   text: "سایت",
                   keyboardType: TextInputType.url,
-                  validator: Validators.website,
+                  validator: (p0) => Validators.website(p0, optional: true),
+                  textDirection: TextDirection.ltr,
+                  onChanged:
+                      (value) => widget.bloc.add(
+                        UpdateWorkspaceDraft(websiteUrl: value),
+                      ),
                 ),
 
                 const SizedBox(height: 7),
@@ -265,7 +326,7 @@ class _ContactsInfoState extends State<ContactsInfo>
                           width: 100,
                           onPress: () {
                             widget.bloc.add(
-                              const ChangeWorkspaceTabView(activeTabIndex: 0),
+                              const PreviousWorkspaceStep(),
                             );
                           },
                           text: "قبلی",
@@ -279,8 +340,8 @@ class _ContactsInfoState extends State<ContactsInfo>
                           text:
                               BlocProvider.of<CreateWorkSpaceBloc>(
                                         context,
-                                      ).state.status ==
-                                      CWSStatus.loading
+                                      ).state.draftSaveStatus ==
+                                      DraftSaveStatus.saving
                                   ? null
                                   : "بعدی",
                           color: Colors.white,
@@ -290,8 +351,8 @@ class _ContactsInfoState extends State<ContactsInfo>
                           btnWidget:
                               BlocProvider.of<CreateWorkSpaceBloc>(
                                         context,
-                                      ).state.status ==
-                                      CWSStatus.loading
+                                      ).state.draftSaveStatus ==
+                                      DraftSaveStatus.saving
                                   ? const Center(
                                     child: SizedBox(
                                       height: 25,

@@ -3,8 +3,10 @@ import 'package:asood/features/create_workspace/data/datasources/market_api_serv
 import 'package:asood/features/create_workspace/data/datasources/region_api_services.dart';
 import 'package:asood/features/create_workspace/data/repositories/create_market_repository_imp.dart';
 import 'package:asood/features/create_workspace/data/repositories/region_repository_imp.dart';
+import 'package:asood/features/create_workspace/data/repositories/shared_preferences_workspace_draft_repository.dart';
 import 'package:asood/features/create_workspace/domain/repositories/create_market_repository.dart';
 import 'package:asood/features/create_workspace/domain/repositories/region_repository.dart';
+import 'package:asood/features/create_workspace/domain/repositories/workspace_draft_repository.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/job_managment/data/data_source/category_api_service.dart';
 import 'package:asood/features/job_managment/data/repository/category_repository_imp.dart';
@@ -34,11 +36,15 @@ void registerWorkspaceModule(GetIt locator) {
   locator.registerLazySingleton<RegionRepository>(
     () => RegionRepositoryImp(locator<RegionApiServices>()),
   );
+  locator.registerLazySingleton<WorkspaceDraftRepository>(
+    SharedPreferencesWorkspaceDraftRepository.new,
+  );
 
   locator.registerFactory(
     () => CreateWorkSpaceBloc(
       locator<CreateMarketRepository>(),
       locator<RegionRepository>(),
+      locator<WorkspaceDraftRepository>(),
     ),
   );
   locator.registerFactory(
