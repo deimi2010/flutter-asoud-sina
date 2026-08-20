@@ -8,7 +8,6 @@ import 'package:asood/features/vendor/presentation/widgets/dashboard_carousel.da
 import 'package:asood/features/vendor/presentation/widgets/item_box_with_title.dart';
 import 'package:asood/features/vendor/presentation/widgets/simple_itembox.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
@@ -620,7 +619,7 @@ class DashboardAdditionalWidget extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 3,
                 shrinkWrap: true,
-                scrollCacheExtent: const ScrollCacheExtent.pixels(2),
+                cacheExtent: 200,
                 childAspectRatio: 1,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
@@ -712,7 +711,6 @@ class DashboardServicesWidget extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 3,
                     shrinkWrap: true,
-                    scrollCacheExtent: const ScrollCacheExtent.pixels(2),
                     childAspectRatio: 3 / 4,
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 15,

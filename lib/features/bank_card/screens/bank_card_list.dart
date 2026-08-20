@@ -201,7 +201,7 @@ class _BankCardListScreenState extends State<BankCardListScreen> {
                                 child: DropdownButtonFormField<String>(
                                   style: TextStyle(color: Colors.white),
                                   // hint: Text(''),
-                                  initialValue: banks[0]['name'],
+                                  value: banks[0]['name'] as String,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colora.primaryColor,
