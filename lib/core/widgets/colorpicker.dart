@@ -11,6 +11,7 @@ class AColorPicker extends StatefulWidget {
     required this.titleWidget,
     this.paletteType = PaletteType.hsvWithHue,
     this.currentIndex = 0,
+    this.initialColor = Colors.white,
     this.mainColor,
     this.backgroundColor,
     this.secondColor,
@@ -19,6 +20,7 @@ class AColorPicker extends StatefulWidget {
   final Widget titleWidget;
   final PaletteType paletteType;
   final int? currentIndex;
+  final Color initialColor;
   final Function(Color)? mainColor;
   final Function(Color)? backgroundColor;
   final Function(Color)? secondColor;
@@ -84,7 +86,7 @@ class _AColorPickerState extends State<AColorPicker> {
               labelTypes: const [],
               // labelTextStyle: const TextStyle(color: Colora.scaffold_),
               pickerAreaHeightPercent: .5,
-              pickerColor: Colors.white,
+              pickerColor: widget.initialColor,
             ),
           ),
         ],
@@ -99,6 +101,7 @@ class BColorPicker extends StatefulWidget {
     required this.titleWidget,
     this.paletteType = PaletteType.hsvWithHue,
     this.currentIndex = 0,
+    this.initialColor = Colors.white,
     this.fontColor,
     this.fontSecondColor,
   });
@@ -106,6 +109,7 @@ class BColorPicker extends StatefulWidget {
   final Widget titleWidget;
   final PaletteType paletteType;
   final int currentIndex;
+  final Color initialColor;
 
   final Function(Color)? fontColor;
   final Function(Color)? fontSecondColor;
@@ -166,7 +170,7 @@ class _BColorPickerState extends State<BColorPicker> {
               enableAlpha: false,
               labelTypes: const [],
               pickerAreaHeightPercent: .5,
-              pickerColor: Colors.white,
+              pickerColor: widget.initialColor,
             ),
           ),
         ],

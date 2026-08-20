@@ -30,15 +30,19 @@ class Endpoints {
   /// market
   static String baseMarket = 'owner/market';
   static String ownerMarketList = '$baseMarket/list/';
+  static String ownerMarketDetail(String marketId) => '$baseMarket/$marketId/';
   static String ownerCreateMarket = '$baseMarket/create/';
   static String ownerUpdateMarket(String marketId) =>
       '$baseMarket/update/$marketId/';
   static String ownerCreateMarketContect = '$baseMarket/contact/create/';
+  static String ownerMarketContact(String marketId) =>
+      '$baseMarket/contact/$marketId/';
   static String ownerUpdateMarketContact(String marketId) =>
       '$baseMarket/contact/update/$marketId/';
   static String ownerSlider = '$baseMarket/slider';
   static String ownerDeleteBg = '$baseMarket/background';
   static String ownerTheme = '$baseMarket/theme';
+  static String ownerGateway = '$baseMarket/gateway';
   static String ownerCommentList = '$baseMarket/comment/list';
   static String ownerBackground = '$baseMarket/background';
   static String ownerLogo = '$baseMarket/logo';
@@ -46,13 +50,22 @@ class Endpoints {
   static String ownerInactive = '$baseMarket/inactive';
   static String ownerUnpublish = '$baseMarket/unpublish';
   static String ownerLocationCreate = '$baseMarket/location/create/';
+  static String ownerMarketLocation(String marketId) =>
+      '$baseMarket/location/$marketId/';
   static String ownerUpdateMarketLocation(String marketId) =>
       '$baseMarket/location/update/$marketId/';
   static String ownerCreateSchedule = '$baseMarket/schedules/create/';
+  static String ownerScheduleList = '$baseMarket/schedules/list/';
   static String ownerReplaceSchedules = '$baseMarket/schedules/replace/';
   static String paymentCreate = 'user/payments/create/';
   static String paymentRedirect(String paymentSessionId) =>
       '${baseUrl}user/payments/pay?id=$paymentSessionId';
+
+  /// Discount
+  static String discountOwnerCreate = 'discount/owner/create/';
+  static String discountOwnerList = 'discount/owner/list/';
+  static String discountOwnerDetail(String discountId) =>
+      'discount/owner/$discountId/';
 
   /// Product
   // owner

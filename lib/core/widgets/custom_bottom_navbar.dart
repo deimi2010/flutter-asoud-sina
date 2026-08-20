@@ -1,8 +1,11 @@
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/helper/secure_storage.dart';
+import 'package:asood/core/helper/theme_color.dart';
+import 'package:asood/core/models/market_model.dart';
 import 'package:asood/core/router/app_routers.dart';
 import 'package:asood/core/widgets/colorpicker.dart';
 import 'package:asood/features/market/presentation/blocs/bloc/market_bloc.dart';
+import 'package:asood/features/market/presentation/widgets/gateway_connection_dialog.dart';
 import 'package:asood/features/vendor/presentation/bloc/vendor/vendor_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +18,7 @@ import '../constants/endpoints.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final String? marketId;
+  final MarketModel? market;
   final bool? userMode;
   final Color? initTopColor;
   final Color? initBackColor;
@@ -27,6 +31,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({
     super.key,
     this.marketId,
+    this.market,
     this.userMode = true,
     this.initBackColor,
     this.initTopColor,
@@ -69,6 +74,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           marketBloc,
 
           widget.marketId,
+          widget.market,
 
           widget.initTopColor,
           widget.initBackColor,
@@ -131,6 +137,7 @@ void showBottomSheet(
   bloc,
   marketBloc,
   marketId,
+  MarketModel? market,
   initTopColor,
   initBackColor,
   initSecondColor,
@@ -214,12 +221,22 @@ void showBottomSheet(
 
             if (userMode == false)
               Row(
+                textDirection: TextDirection.rtl,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   //Takhfif Route
                   IconButton(
                     onPressed: () {
-                      context.push(AppRoutes.takhfif);
+                      final selectedMarket = market;
+                      if (selectedMarket == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('اطلاعات فروشگاه در دسترس نیست'),
+                          ),
+                        );
+                        return;
+                      }
+                      context.push(AppRoutes.takhfif, extra: selectedMarket);
                       /*  Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -227,12 +244,20 @@ void showBottomSheet(
                         ),
                       ); */
                     },
+                    tooltip: 'ساخت کد تخفیف',
                     icon: const Icon(Icons.settings, color: Colors.white),
                   ),
 
                   //credit card
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await showGatewayConnectionDialog(
+                        context,
+                        marketId: marketId?.toString() ?? '',
+                      );
+                      if (context.mounted) Navigator.pop(context);
+                    },
+                    tooltip: 'اتصال به درگاه',
                     icon: const Icon(Icons.credit_card, color: Colors.white),
                   ),
 
@@ -316,7 +341,10 @@ void showBottomSheet(
                   // edit store info
                   IconButton(
                     onPressed: () {
-                      context.push(AppRoutes.editStoreInfo);
+                      if (market == null) return;
+                      final router = GoRouter.of(context);
+                      Navigator.pop(context);
+                      router.push(AppRoutes.editStoreInfo, extra: market);
                       /*      Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -324,6 +352,8 @@ void showBottomSheet(
                         ),
                       ); */
                     },
+                    tooltip:
+                        '\u0648\u06cc\u0631\u0627\u06cc\u0634 \u0627\u0637\u0644\u0627\u0639\u0627\u062a \u0641\u0631\u0648\u0634\u06af\u0627\u0647',
                     icon: const Icon(Icons.edit_square, color: Colors.white),
                   ),
                 ],
@@ -393,9 +423,9 @@ void changeFont(
 
   int index = 0;
 
-  int currentFontIndex = -1;
+  int currentFontIndex = fontList.keys.toList().indexOf(initFont);
 
-  bool pos = false;
+  Alignment pipAlignment = Alignment.bottomCenter;
 
   String initSelectedFont = initFont;
   Color initSelectedFontColor = initFontColor;
@@ -411,8 +441,7 @@ void changeFont(
             return AlertDialog(
               contentPadding: const EdgeInsets.all(0),
               backgroundColor: Colors.transparent,
-              alignment:
-                  pos == false ? Alignment.bottomCenter : Alignment.topCenter,
+              alignment: pipAlignment,
               content: Container(
                 height: Dimensions.height * 0.47,
                 width: Dimensions.width * 0.8,
@@ -487,6 +516,7 @@ void changeFont(
                         SizedBox(height: Dimensions.height * 0.08),
                       ] else if (index == 1) ...[
                         BColorPicker(
+                          initialColor: initSelectedFontColor,
                           paletteType: PaletteType.hsl,
                           titleWidget: Container(
                             height: 40,
@@ -509,6 +539,7 @@ void changeFont(
                         ),
                       ] else if (index == 2) ...[
                         BColorPicker(
+                          initialColor: initSelectedFontSecondColor,
                           paletteType: PaletteType.hsl,
                           titleWidget: Container(
                             height: 40,
@@ -645,22 +676,19 @@ void changeFont(
                             //save
                             MaterialButton(
                               onPressed: () {
-                                var topColor = initTopColor.value
-                                    .toRadixString(16)
-                                    .substring(2, 8);
-                                var secondColor = initSecondColor.value
-                                    .toRadixString(16)
-                                    .substring(2, 8);
-                                var backColor = initBackColor.value
-                                    .toRadixString(16)
-                                    .substring(2, 8);
-                                var fontColor = initSelectedFontColor.value
-                                    .toRadixString(16)
-                                    .substring(2, 8);
-                                var fontSecondColor =
-                                    initSelectedFontSecondColor.value
-                                        .toRadixString(16)
-                                        .substring(2, 8);
+                                final topColor = themeColorToHex(initTopColor);
+                                final secondColor = themeColorToHex(
+                                  initSecondColor,
+                                );
+                                final backColor = themeColorToHex(
+                                  initBackColor,
+                                );
+                                final fontColor = themeColorToHex(
+                                  initSelectedFontColor,
+                                );
+                                final fontSecondColor = themeColorToHex(
+                                  initSelectedFontSecondColor,
+                                );
 
                                 bloc.add(
                                   SelectTheme(
@@ -675,7 +703,15 @@ void changeFont(
                                   ),
                                 );
 
+                                final messenger = ScaffoldMessenger.of(context);
                                 Navigator.pop(context);
+                                messenger.showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      '\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0641\u0648\u0646\u062a \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f\u061b \u062f\u0631 \u0632\u0645\u0627\u0646 \u0627\u062a\u0635\u0627\u0644 \u0628\u0627 \u0633\u0631\u0648\u0631 \u0647\u0645\u06af\u0627\u0645 \u0645\u06cc\u200c\u0634\u0648\u062f',
+                                    ),
+                                  ),
+                                );
                               },
                               child: Text(
                                 'ذخیره',
@@ -687,17 +723,31 @@ void changeFont(
                               ),
                             ),
 
-                            IconButton(
-                              onPressed: () {
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onPanUpdate: (details) {
                                 setState(() {
-                                  pos = !pos;
+                                  pipAlignment = _movePip(
+                                    pipAlignment,
+                                    details,
+                                  );
                                 });
                               },
-                              icon: Icon(
-                                pos == false
-                                    ? Icons.arrow_circle_up_rounded
-                                    : Icons.arrow_circle_down_rounded,
-                                color: Colora.scaffold,
+                              onTap: () {
+                                setState(() {
+                                  pipAlignment =
+                                      pipAlignment.y > 0
+                                          ? Alignment.topCenter
+                                          : Alignment.bottomCenter;
+                                });
+                              },
+                              child: const SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: Icon(
+                                  Icons.open_with_rounded,
+                                  color: Colora.scaffold,
+                                ),
                               ),
                             ),
 
@@ -755,7 +805,7 @@ void changeColor(
   Color backgroundColorPicker = initBackColor;
   Color secondColorPicker = initSecondColor;
 
-  bool pos = false;
+  Alignment pipAlignment = Alignment.bottomCenter;
 
   showDialog(
     barrierColor: const Color(0x00000000),
@@ -767,14 +817,14 @@ void changeColor(
             return AlertDialog(
               contentPadding: const EdgeInsets.all(0),
               backgroundColor: Colors.transparent,
-              alignment:
-                  pos == false ? Alignment.bottomCenter : Alignment.topCenter,
+              alignment: pipAlignment,
               content: SizedBox(
                 height: Dimensions.height * 0.45,
                 child: Column(
                   children: [
                     if (index == 0) ...[
                       AColorPicker(
+                        initialColor: mainColorPicker,
                         paletteType: PaletteType.hsl,
                         titleWidget: Container(
                           height: 40,
@@ -797,6 +847,7 @@ void changeColor(
                       ),
                     ] else if (index == 1) ...[
                       AColorPicker(
+                        initialColor: secondColorPicker,
                         paletteType: PaletteType.hsl,
                         titleWidget: Container(
                           height: 40,
@@ -819,6 +870,7 @@ void changeColor(
                       ),
                     ] else if (index == 2) ...[
                       AColorPicker(
+                        initialColor: backgroundColorPicker,
                         paletteType: PaletteType.hsl,
                         titleWidget: Container(
                           height: 40,
@@ -955,21 +1007,17 @@ void changeColor(
                           //save
                           MaterialButton(
                             onPressed: () {
-                              var topColor = mainColorPicker.value
-                                  .toRadixString(16)
-                                  .substring(2, 8);
-                              var secondColor = secondColorPicker.value
-                                  .toRadixString(16)
-                                  .substring(2, 8);
-                              var backColor = backgroundColorPicker.value
-                                  .toRadixString(16)
-                                  .substring(2, 8);
-                              var fontColor = initFontColor.value
-                                  .toRadixString(16)
-                                  .substring(2, 8);
-                              var fontSecondColor = initFontSecondColor.value
-                                  .toRadixString(16)
-                                  .substring(2, 8);
+                              final topColor = themeColorToHex(mainColorPicker);
+                              final secondColor = themeColorToHex(
+                                secondColorPicker,
+                              );
+                              final backColor = themeColorToHex(
+                                backgroundColorPicker,
+                              );
+                              final fontColor = themeColorToHex(initFontColor);
+                              final fontSecondColor = themeColorToHex(
+                                initFontSecondColor,
+                              );
 
                               bloc.add(
                                 SelectTheme(
@@ -984,7 +1032,15 @@ void changeColor(
                                 ),
                               );
 
+                              final messenger = ScaffoldMessenger.of(context);
                               Navigator.pop(context);
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    '\u0631\u0646\u06af\u200c\u0628\u0646\u062f\u06cc \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f\u061b \u062f\u0631 \u0632\u0645\u0627\u0646 \u0627\u062a\u0635\u0627\u0644 \u0628\u0627 \u0633\u0631\u0648\u0631 \u0647\u0645\u06af\u0627\u0645 \u0645\u06cc\u200c\u0634\u0648\u062f',
+                                  ),
+                                ),
+                              );
                             },
                             child: Text(
                               'ذخیره',
@@ -996,17 +1052,28 @@ void changeColor(
                             ),
                           ),
 
-                          IconButton(
-                            onPressed: () {
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onPanUpdate: (details) {
                               setState(() {
-                                pos = !pos;
+                                pipAlignment = _movePip(pipAlignment, details);
                               });
                             },
-                            icon: Icon(
-                              pos == false
-                                  ? Icons.arrow_circle_up_rounded
-                                  : Icons.arrow_circle_down_rounded,
-                              color: Colora.scaffold,
+                            onTap: () {
+                              setState(() {
+                                pipAlignment =
+                                    pipAlignment.y > 0
+                                        ? Alignment.topCenter
+                                        : Alignment.bottomCenter;
+                              });
+                            },
+                            child: const SizedBox(
+                              width: 48,
+                              height: 48,
+                              child: Icon(
+                                Icons.open_with_rounded,
+                                color: Colora.scaffold,
+                              ),
                             ),
                           ),
 
@@ -1040,5 +1107,16 @@ void changeColor(
             );
           },
         ),
+  );
+}
+
+Alignment _movePip(Alignment current, DragUpdateDetails details) {
+  return Alignment(
+    (current.x + details.delta.dx / (Dimensions.width * .4))
+        .clamp(-1.0, 1.0)
+        .toDouble(),
+    (current.y + details.delta.dy / (Dimensions.height * .25))
+        .clamp(-1.0, 1.0)
+        .toDouble(),
   );
 }

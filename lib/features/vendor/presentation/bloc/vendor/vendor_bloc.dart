@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:asood/core/http_client/api_status.dart';
+import 'package:asood/core/helper/market_customization_storage.dart';
+import 'package:asood/core/helper/theme_color.dart';
 import 'package:asood/core/models/comment_model.dart';
 import 'package:asood/core/models/theme_model.dart';
 import 'package:asood/features/create_workspace/domain/repositories/create_market_repository.dart';
@@ -264,24 +266,56 @@ class VendorBloc extends Bloc<VendorEvent, VendorState> {
       secondaryFontColor: event.fontSecondaryColor,
     );
 
+    emit(
+      state.copyWith(
+        status: CWSStatus.loading,
+        topColor: themeColorFromHex(event.color, state.topColor),
+        backColor: themeColorFromHex(event.backgroundColor, state.backColor),
+        secondColor: themeColorFromHex(event.secondaryColor, state.secondColor),
+        fontColor: themeColorFromHex(event.fontColor, state.fontColor),
+        secondFontColor: themeColorFromHex(
+          event.fontSecondaryColor,
+          state.secondFontColor,
+        ),
+        fontFamily: event.font ?? state.fontFamily,
+      ),
+    );
+    await MarketCustomizationStorage.saveTheme(
+      event.marketId,
+      themeModel,
+      pendingSync: true,
+    );
+
     try {
       var res = await marketRepository.setMarketTheme(
         event.marketId,
         themeModel,
       );
       if (res is Success) {
+        await MarketCustomizationStorage.saveTheme(
+          event.marketId,
+          themeModel,
+          pendingSync: false,
+        );
         // var json = jsonDecode(res.response.toString());
-        emit(state.copyWith(status: CWSStatus.success));
+        emit(state.copyWith(status: CWSStatus.success, message: 'synced'));
       } else {
         emit(
           state.copyWith(
-            status: CWSStatus.failure,
+            status: CWSStatus.success,
+            message: 'saved_locally',
             error: res.error.toString(),
           ),
         );
       }
     } catch (e) {
-      emit(state.copyWith(status: CWSStatus.failure, error: e.toString()));
+      emit(
+        state.copyWith(
+          status: CWSStatus.success,
+          message: 'saved_locally',
+          error: e.toString(),
+        ),
+      );
     }
 
     emit(state.copyWith(status: CWSStatus.initial));

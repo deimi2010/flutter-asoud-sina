@@ -16,11 +16,11 @@ class MarketScheduleModel {
 
   factory MarketScheduleModel.fromJson(Map<String, dynamic> json) {
     return MarketScheduleModel(
-      market: json['market'],
-      day: json['day'],
-      start: json['start'],
-      intervalIndex: json['interval_index'] ?? 1,
-      end: json['end'],
+      market: json['market']?.toString() ?? '',
+      day: json['day']?.toString() ?? '',
+      start: json['start']?.toString() ?? '',
+      intervalIndex: json['interval_index'] as int? ?? 1,
+      end: json['end']?.toString(),
     );
   }
 

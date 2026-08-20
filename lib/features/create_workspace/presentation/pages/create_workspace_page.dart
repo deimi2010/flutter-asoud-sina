@@ -1,6 +1,6 @@
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/helper/snack_bar_util.dart';
-import 'package:asood/core/http_client/api_status.dart';
+import 'package:asood/core/models/market_model.dart';
 import 'package:asood/core/widgets/appbar/default_appbar.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:asood/features/create_workspace/presentation/pages/tabs/basic_info.dart';
@@ -11,7 +11,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class CreateWorkSpaceScreen extends StatefulWidget {
-  const CreateWorkSpaceScreen({super.key});
+  const CreateWorkSpaceScreen({super.key, this.market});
+
+  final MarketModel? market;
 
   @override
   State<CreateWorkSpaceScreen> createState() => _CreateWorkSpaceScreenState();
@@ -20,13 +22,18 @@ class CreateWorkSpaceScreen extends StatefulWidget {
 class _CreateWorkSpaceScreenState extends State<CreateWorkSpaceScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final String _sessionToken;
   int _activeTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _sessionToken = DateTime.now().microsecondsSinceEpoch.toString();
     _tabController = TabController(length: 3, vsync: this)
       ..addListener(_onTabChanged);
+    context.read<CreateWorkSpaceBloc>().add(
+      InitializeWorkspace(sessionToken: _sessionToken, market: widget.market),
+    );
   }
 
   void _onTabChanged() {
@@ -86,12 +93,20 @@ class _CreateWorkSpaceScreenState extends State<CreateWorkSpaceScreen>
                 }
               },
               builder: (context, state) {
+                if (state.sessionToken != _sessionToken ||
+                    !state.isDraftLoaded) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 return NestedScrollView(
                   headerSliverBuilder: (context, innerBoxIsScrolled) {
                     return [
                       // AppBar ثابت
                       SliverToBoxAdapter(
-                        child: const NewAppBar(title: 'ثبت دفتر کار'),
+                        child: NewAppBar(
+                          title: state.isEditing
+                              ? '\u0648\u06cc\u0631\u0627\u06cc\u0634 \u0627\u0637\u0644\u0627\u0639\u0627\u062a \u0641\u0631\u0648\u0634\u06af\u0627\u0647'
+                              : '\u062b\u0628\u062a \u062f\u0641\u062a\u0631 \u06a9\u0627\u0631',
+                        ),
                       ),
 
                       SliverPersistentHeader(

@@ -1,4 +1,3 @@
-import 'package:asood/core/http_client/api_status.dart';
 import 'package:asood/features/create_workspace/data/models/market_schedule.dart';
 import 'package:asood/features/create_workspace/presentation/bloc/create_workspace_bloc.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +71,7 @@ class _WeekdayOpentimeState extends State<WeekdayOpentime> {
   TimeOfDay? _parseTime(String? value) {
     if (value == null || value.isEmpty) return null;
     final parts = value.split(':');
-    if (parts.length != 2) return null;
+    if (parts.length < 2) return null;
     final hour = int.tryParse(parts[0]);
     final minute = int.tryParse(parts[1]);
     if (hour == null || minute == null) return null;

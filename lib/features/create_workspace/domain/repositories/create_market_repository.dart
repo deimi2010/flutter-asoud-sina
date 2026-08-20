@@ -39,6 +39,14 @@ abstract class CreateMarketRepository {
 
   Future<dynamic> getMarketList();
 
+  Future<dynamic> getMarketBase(String marketId);
+
+  Future<dynamic> getMarketContact(String marketId);
+
+  Future<dynamic> getMarketLocation(String marketId);
+
+  Future<dynamic> getMarketSchedules(String marketId);
+
   Future<dynamic> inactiveMarket(marketId);
 
   Future<dynamic> unpublishMarket(marketId);

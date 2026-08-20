@@ -4,6 +4,13 @@ class CreateWorkSpaceEvent {
   const CreateWorkSpaceEvent();
 }
 
+class InitializeWorkspace extends CreateWorkSpaceEvent {
+  const InitializeWorkspace({required this.sessionToken, this.market});
+
+  final String sessionToken;
+  final MarketModel? market;
+}
+
 class LoadWorkspaceDraft extends CreateWorkSpaceEvent {
   const LoadWorkspaceDraft();
 }

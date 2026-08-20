@@ -1,7 +1,7 @@
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/helper/snack_bar_util.dart';
 import 'package:asood/core/helper/validators.dart';
-import 'package:asood/core/http_client/api_status.dart';
+import 'package:asood/core/models/location_model.dart';
 import 'package:asood/core/widgets/custom_button.dart';
 import 'package:asood/core/widgets/custom_textfield.dart';
 import 'package:asood/core/widgets/map_widget_2.dart';
@@ -130,9 +130,19 @@ class _LocationInfoState extends State<LocationInfo> {
               ),
               child: BlocConsumer<CreateWorkSpaceBloc, CreateWorkSpaceState>(
                 listener: (context, state) {
-                  if (_waitingForDraftCompletion && state.isDraftComplete) {
+                  if (_waitingForDraftCompletion &&
+                      state.submitStatus == WorkspaceSubmitStatus.success) {
                     _waitingForDraftCompletion = false;
-                    paymentDialog(context);
+                    if (state.isEditing) {
+                      final message =
+                          state.syncStatus == WorkspaceSyncStatus.localOnly
+                          ? '\u062a\u063a\u06cc\u06cc\u0631\u0627\u062a \u0628\u0647 \u0635\u0648\u0631\u062a \u0645\u062d\u0644\u06cc \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f\u061b \u067e\u0633 \u0627\u0632 \u0628\u0631\u0642\u0631\u0627\u0631\u06cc \u0627\u0631\u062a\u0628\u0627\u0637 \u062f\u0648\u0628\u0627\u0631\u0647 \u0630\u062e\u06cc\u0631\u0647 \u06a9\u0646\u06cc\u062f.'
+                          : '\u062a\u063a\u06cc\u06cc\u0631\u0627\u062a \u0630\u062e\u06cc\u0631\u0647 \u0648 \u0628\u0631\u0627\u06cc \u062a\u0623\u06cc\u06cc\u062f \u0627\u0631\u0633\u0627\u0644 \u0634\u062f.';
+                      showSnackBar(context, message);
+                      Navigator.of(context).pop(true);
+                    } else {
+                      paymentDialog(context);
+                    }
                   }
                   if (state.regionLoadStatus == RegionLoadStatus.success &&
                       _pendingSelection != null) {
@@ -204,8 +214,9 @@ class _LocationInfoState extends State<LocationInfo> {
                           width: Dimensions.width * 0.88,
                           height: Dimensions.height * 0.05,
                           color: Colors.white,
-                          text:
-                              state.province.isEmpty ? "استان" : state.province,
+                          text: state.province.isEmpty
+                              ? "استان"
+                              : state.province,
                           textColor: Colora.primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -246,10 +257,8 @@ class _LocationInfoState extends State<LocationInfo> {
                           controller: addressController,
                           text: "آدرس فروشگاه",
                           keyboardType: TextInputType.streetAddress,
-                          onChanged:
-                              (value) => bloc.add(
-                                UpdateWorkspaceDraft(address: value),
-                              ),
+                          onChanged: (value) =>
+                              bloc.add(UpdateWorkspaceDraft(address: value)),
                         ),
                         const SizedBox(height: 7),
 
@@ -260,10 +269,8 @@ class _LocationInfoState extends State<LocationInfo> {
                           maxLength: 10,
                           validator: Validators.post,
                           keyboardType: TextInputType.number,
-                          onChanged:
-                              (value) => bloc.add(
-                                UpdateWorkspaceDraft(postalCode: value),
-                              ),
+                          onChanged: (value) =>
+                              bloc.add(UpdateWorkspaceDraft(postalCode: value)),
                         ),
 
                         //location picker
@@ -279,12 +286,23 @@ class _LocationInfoState extends State<LocationInfo> {
                               borderRadius: BorderRadius.circular(20),
                               child: MapScreen(
                                 isSelecting: true,
+                                showInitialMarker:
+                                    state.latitude.isNotEmpty &&
+                                    state.longitude.isNotEmpty,
+                                initialLocation: LocationModel(
+                                  lat:
+                                      double.tryParse(state.latitude) ??
+                                      35.6783,
+                                  lon:
+                                      double.tryParse(state.longitude) ??
+                                      51.4161,
+                                ),
                                 selectedLocation: (mapLocation) {
                                   bloc.add(
                                     ChangeLocDataEvent(
                                       latitude: mapLocation.latitude.toString(),
-                                      longitude:
-                                          mapLocation.longitude.toString(),
+                                      longitude: mapLocation.longitude
+                                          .toString(),
                                     ),
                                   );
                                 },
@@ -324,7 +342,8 @@ class _LocationInfoState extends State<LocationInfo> {
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
 
-                                    if (state.cityId.isEmpty ||
+                                    if (!_formKey.currentState!.validate() ||
+                                        state.cityId.isEmpty ||
                                         addressController.text.isEmpty) {
                                       showSnackBar(
                                         context,
@@ -340,10 +359,10 @@ class _LocationInfoState extends State<LocationInfo> {
                                       _waitingForDraftCompletion = true;
                                       widget.bloc.add(
                                         SaveMarketLocationEvent(
-                                          address:
-                                              addressController.text.trim(),
-                                          postalCode:
-                                              zipCodeController.text.trim(),
+                                          address: addressController.text
+                                              .trim(),
+                                          postalCode: zipCodeController.text
+                                              .trim(),
                                         ),
                                       );
                                     }

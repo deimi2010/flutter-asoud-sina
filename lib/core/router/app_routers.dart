@@ -82,6 +82,13 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: AppRoutes.editStoreInfo,
+        builder: (context, state) {
+          final market = state.extra as MarketModel;
+          return CreateWorkSpaceScreen(market: market);
+        },
+      ),
+      GoRoute(
         path: AppRoutes.chatList,
         builder: (context, state) => ChatList(),
       ),
@@ -163,7 +170,10 @@ class AppRouter {
 
       GoRoute(
         path: AppRoutes.takhfif,
-        builder: (context, state) => TakhfifScreen(),
+        builder: (context, state) {
+          final market = state.extra as MarketModel;
+          return TakhfifScreen(market: market);
+        },
       ),
       GoRoute(
         path: AppRoutes.fontColorSettings,

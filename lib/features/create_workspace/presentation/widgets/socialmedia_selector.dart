@@ -73,7 +73,7 @@ void showSocialSelectionDialog(
                     ),
                     dropdownColor: Colora.primaryColor,
                     iconEnabledColor: Colors.white,
-                    value: selectedPlatform,
+                    initialValue: selectedPlatform,
                     items:
                         platforms.entries.map((entry) {
                           return DropdownMenuItem<String>(

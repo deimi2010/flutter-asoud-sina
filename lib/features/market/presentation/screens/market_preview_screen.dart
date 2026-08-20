@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/helper/secure_storage.dart';
+import 'package:asood/core/helper/theme_color.dart';
 import 'package:asood/core/http_client/api_status.dart';
 import 'package:asood/core/models/location_model.dart';
 import 'package:asood/core/models/market_model.dart';
@@ -68,120 +69,26 @@ class _MarketPreviewScreenState extends State<MarketPreviewScreen> {
   }
 
   void initTheme() {
-    if (widget.market.theme != null) {
-      //top color
-      if (widget.market.theme!.color != null) {
-        bloc.add(
-          SelectTopColor(
-            topColor: Color(int.parse('0xFF${widget.market.theme!.color}')),
-          ),
-        );
-      } else {
-        bloc.add(const SelectTopColor(topColor: Colora.primaryColor));
-      }
+    final theme = widget.market.theme;
+    final topColor = themeColorFromHex(theme?.color, Colora.primaryColor);
+    initBackColor = themeColorFromHex(theme?.backgroundColor, Colora.scaffold);
+    initSecondColor = themeColorFromHex(
+      theme?.secondaryColor,
+      Colora.lightBlue,
+    );
+    initFont = theme?.font?.isNotEmpty == true ? theme!.font! : 'irs';
+    initFontColor = themeColorFromHex(theme?.fontColor, Colora.scaffold);
+    initFontSecondColor = themeColorFromHex(
+      theme?.secondaryFontColor,
+      Colora.primaryColor,
+    );
 
-      //background color
-      if (widget.market.theme!.backgroundColor != null) {
-        bloc.add(
-          SelectBackColor(
-            backColor: Color(
-              int.parse('0xFF${widget.market.theme!.backgroundColor}'),
-            ),
-          ),
-        );
-        initBackColor = Color(
-          int.parse('0xFF${widget.market.theme!.backgroundColor}'),
-        );
-      } else {
-        bloc.add(const SelectBackColor(backColor: Colora.scaffold));
-        initBackColor = Colora.scaffold;
-      }
-
-      //second color
-      if (widget.market.theme!.secondaryColor != null) {
-        bloc.add(
-          SelectSecondColor(
-            secondColor: Color(
-              int.parse('0xFF${widget.market.theme!.secondaryColor}'),
-            ),
-          ),
-        );
-        initSecondColor = Color(
-          int.parse('0xFF${widget.market.theme!.secondaryColor}'),
-        );
-      } else {
-        bloc.add(const SelectSecondColor(secondColor: Colora.lightBlue));
-        initSecondColor = Colora.lightBlue;
-      }
-
-      // font family
-      if (widget.market.theme!.font != null) {
-        bloc.add(SelectFontFamily(fontFamily: widget.market.theme!.font!));
-        initFont = widget.market.theme!.font!;
-      } else {
-        bloc.add(const SelectFontFamily(fontFamily: 'irs'));
-        initFont = 'irs';
-      }
-
-      //font color
-      if (widget.market.theme!.fontColor != null) {
-        bloc.add(
-          SelectFontColor(
-            fontColor: Color(
-              int.parse('0xFF${widget.market.theme!.fontColor}'),
-            ),
-          ),
-        );
-        initFontColor = Color(
-          int.parse('0xFF${widget.market.theme!.fontColor}'),
-        );
-      } else {
-        bloc.add(const SelectFontColor(fontColor: Colora.scaffold));
-        initFontColor = Colora.scaffold;
-      }
-
-      //font second color
-      if (widget.market.theme!.fontColor != null) {
-        bloc.add(
-          SelectSecondFontColor(
-            secondFontColor: Color(
-              int.parse('0xFF${widget.market.theme!.secondaryFontColor}'),
-            ),
-          ),
-        );
-        initFontSecondColor = Color(
-          int.parse('0xFF${widget.market.theme!.secondaryFontColor}'),
-        );
-      } else {
-        bloc.add(
-          const SelectSecondFontColor(secondFontColor: Colora.primaryColor),
-        );
-        initFontSecondColor = Colora.primaryColor;
-      }
-    } else {
-      //top color
-      bloc.add(const SelectTopColor(topColor: Colora.primaryColor));
-
-      //second top color
-      bloc.add(const SelectSecondColor(secondColor: Colora.lightBlue));
-      initSecondColor = Colora.lightBlue;
-
-      //back color
-      bloc.add(const SelectBackColor(backColor: Colora.scaffold));
-      initBackColor = Colora.scaffold;
-
-      //font family
-      bloc.add(const SelectFontFamily(fontFamily: 'irs'));
-      initFont = 'irs';
-
-      bloc.add(const SelectFontColor(fontColor: Colora.scaffold));
-      initFontColor = Colora.scaffold;
-
-      bloc.add(
-        const SelectSecondFontColor(secondFontColor: Colora.primaryColor),
-      );
-      initFontSecondColor = Colora.primaryColor;
-    }
+    bloc.add(SelectTopColor(topColor: topColor));
+    bloc.add(SelectBackColor(backColor: initBackColor));
+    bloc.add(SelectSecondColor(secondColor: initSecondColor));
+    bloc.add(SelectFontFamily(fontFamily: initFont));
+    bloc.add(SelectFontColor(fontColor: initFontColor));
+    bloc.add(SelectSecondFontColor(secondFontColor: initFontSecondColor));
   }
 
   void loadSlider() {
@@ -336,9 +243,9 @@ class _MarketPreviewScreenState extends State<MarketPreviewScreen> {
                                                       BorderRadius.circular(20),
                                                   child: Shimmer.fromColors(
                                                     baseColor: Colors.grey
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     highlightColor: Colors.black
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     direction:
                                                         ShimmerDirection.rtl,
                                                     child: Container(
@@ -435,13 +342,13 @@ class _MarketPreviewScreenState extends State<MarketPreviewScreen> {
                                                                   ) => Shimmer.fromColors(
                                                                     baseColor: Colors
                                                                         .grey
-                                                                        .withOpacity(
-                                                                          0.2,
+                                                                        .withValues(
+                                                                          alpha: 0.2,
                                                                         ),
                                                                     highlightColor: Colors
                                                                         .black
-                                                                        .withOpacity(
-                                                                          0.2,
+                                                                        .withValues(
+                                                                          alpha: 0.2,
                                                                         ),
                                                                     direction:
                                                                         ShimmerDirection
@@ -537,8 +444,8 @@ class _MarketPreviewScreenState extends State<MarketPreviewScreen> {
                                                                   colorFilter: ColorFilter.mode(
                                                                     state
                                                                         .topColor
-                                                                        .withOpacity(
-                                                                          0.7,
+                                                                        .withValues(
+                                                                          alpha: 0.7,
                                                                         ),
                                                                     BlendMode
                                                                         .srcIn,
@@ -683,7 +590,7 @@ class _MarketPreviewScreenState extends State<MarketPreviewScreen> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black.withValues(alpha: 0.5),
                                   blurRadius: 5,
                                   spreadRadius: 2,
                                   offset: const Offset(0, 2),

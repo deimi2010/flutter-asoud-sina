@@ -115,7 +115,7 @@ class StoreAppBar extends StatelessWidget implements PreferredSizeWidget {
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(40),
                 ),
-                color: const Color.fromARGB(255, 0, 4, 253).withOpacity(0.5),
+                color: const Color.fromARGB(255, 0, 4, 253).withValues(alpha: 0.5),
               ),
               margin: const EdgeInsets.only(bottom: 20),
             ),
@@ -358,10 +358,10 @@ class _StoreAppbar2State extends State<StoreAppbar2> {
                                                       url,
                                                     ) => Shimmer.fromColors(
                                                       baseColor: Colors.grey
-                                                          .withOpacity(0.2),
+                                                          .withValues(alpha: 0.2),
                                                       highlightColor: Colors
                                                           .black
-                                                          .withOpacity(0.2),
+                                                          .withValues(alpha: 0.2),
                                                       direction:
                                                           ShimmerDirection.rtl,
                                                       child: Container(
@@ -697,10 +697,10 @@ class _StoreAppbar2State extends State<StoreAppbar2> {
                                                         url,
                                                       ) => Shimmer.fromColors(
                                                         baseColor: Colors.grey
-                                                            .withOpacity(0.2),
+                                                            .withValues(alpha: 0.2),
                                                         highlightColor: Colors
                                                             .black
-                                                            .withOpacity(0.2),
+                                                            .withValues(alpha: 0.2),
                                                         direction:
                                                             ShimmerDirection
                                                                 .rtl,
@@ -885,7 +885,7 @@ class _StoreAppbar2State extends State<StoreAppbar2> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 5,
               spreadRadius: 2,
               offset: const Offset(0, 2),
@@ -924,8 +924,8 @@ class _StoreAppbar2State extends State<StoreAppbar2> {
                           },
                           placeholder:
                               (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey.withOpacity(0.2),
-                                highlightColor: Colors.black.withOpacity(0.2),
+                                baseColor: Colors.grey.withValues(alpha: 0.2),
+                                highlightColor: Colors.black.withValues(alpha: 0.2),
                                 direction: ShimmerDirection.rtl,
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -949,7 +949,7 @@ class _StoreAppbar2State extends State<StoreAppbar2> {
                   child: Container(
                     width: Dimensions.width,
                     height: Dimensions.height * 0.25,
-                    color: widget.mainColor?.withOpacity(0.6),
+                    color: widget.mainColor?.withValues(alpha: 0.6),
                   ),
                 ),
 
@@ -1069,9 +1069,9 @@ class _StoreAppbar2State extends State<StoreAppbar2> {
                                                   url,
                                                 ) => Shimmer.fromColors(
                                                   baseColor: Colors.grey
-                                                      .withOpacity(0.2),
+                                                      .withValues(alpha: 0.2),
                                                   highlightColor: Colors.black
-                                                      .withOpacity(0.2),
+                                                      .withValues(alpha: 0.2),
                                                   direction:
                                                       ShimmerDirection.rtl,
                                                   child: Container(

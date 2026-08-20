@@ -200,7 +200,7 @@ class _LocationInfoState extends State<LocationInfo> {
                                                         child: CustomTextField(
                                                           color: Colora
                                                               .primaryColor
-                                                              .withOpacity(0.5),
+                                                              .withValues(alpha: 0.5),
                                                           controller:
                                                               TextEditingController(),
                                                           text: "کد تخفیف",
@@ -234,7 +234,7 @@ class _LocationInfoState extends State<LocationInfo> {
                                                           20,
                                                         ),
                                                     color: Colors.grey
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                   ),
                                                   child: const Column(
                                                     children: [

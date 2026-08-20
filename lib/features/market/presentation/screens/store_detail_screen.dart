@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/helper/snack_bar_util.dart';
+import 'package:asood/core/helper/market_customization_storage.dart';
+import 'package:asood/core/helper/theme_color.dart';
 import 'package:asood/core/http_client/api_status.dart';
 import 'package:asood/core/models/location_model.dart';
 import 'package:asood/core/models/market_model.dart';
+import 'package:asood/core/models/theme_model.dart';
 import 'package:asood/core/widgets/custom_bottom_navbar.dart';
 import 'package:asood/core/widgets/map_widget_2.dart';
 import 'package:asood/features/market/data/model/theme_model_model.dart';
@@ -64,119 +67,55 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   }
 
   void initTheme() {
-    if (widget.market.theme != null) {
-      //top color
-      if (widget.market.theme!.color != null) {
-        bloc.add(
-          SelectTopColor(
-            topColor: Color(int.parse('0xFF${widget.market.theme!.color}')),
-          ),
-        );
-      } else {
-        bloc.add(const SelectTopColor(topColor: Colora.primaryColor));
-      }
+    _applyTheme(widget.market.theme);
+    _loadLocalTheme();
+  }
 
-      //background color
-      if (widget.market.theme!.backgroundColor != null) {
-        bloc.add(
-          SelectBackColor(
-            backColor: Color(
-              int.parse('0xFF${widget.market.theme!.backgroundColor}'),
-            ),
-          ),
-        );
-        initBackColor = Color(
-          int.parse('0xFF${widget.market.theme!.backgroundColor}'),
-        );
-      } else {
-        bloc.add(const SelectBackColor(backColor: Colora.scaffold));
-        initBackColor = Colora.scaffold;
-      }
+  void _applyTheme(ThemeModel? theme) {
+    final topColor = themeColorFromHex(theme?.color, Colora.primaryColor);
+    initBackColor = themeColorFromHex(theme?.backgroundColor, Colora.scaffold);
+    initSecondColor = themeColorFromHex(
+      theme?.secondaryColor,
+      Colora.lightBlue,
+    );
+    initFont = theme?.font?.isNotEmpty == true ? theme!.font! : 'irs';
+    initFontColor = themeColorFromHex(theme?.fontColor, Colora.scaffold);
+    initFontSecondColor = themeColorFromHex(
+      theme?.secondaryFontColor,
+      Colora.primaryColor,
+    );
 
-      //second color
-      if (widget.market.theme!.secondaryColor != null) {
-        bloc.add(
-          SelectSecondColor(
-            secondColor: Color(
-              int.parse('0xFF${widget.market.theme!.secondaryColor}'),
-            ),
-          ),
-        );
-        initSecondColor = Color(
-          int.parse('0xFF${widget.market.theme!.secondaryColor}'),
-        );
-      } else {
-        bloc.add(const SelectSecondColor(secondColor: Colora.lightBlue));
-        initSecondColor = Colora.lightBlue;
-      }
+    bloc.add(SelectTopColor(topColor: topColor));
+    bloc.add(SelectBackColor(backColor: initBackColor));
+    bloc.add(SelectSecondColor(secondColor: initSecondColor));
+    bloc.add(SelectFontFamily(fontFamily: initFont));
+    bloc.add(SelectFontColor(fontColor: initFontColor));
+    bloc.add(SelectSecondFontColor(secondFontColor: initFontSecondColor));
+  }
 
-      // font family
-      if (widget.market.theme!.font != null) {
-        bloc.add(SelectFontFamily(fontFamily: widget.market.theme!.font!));
-        initFont = widget.market.theme!.font!;
-      } else {
-        bloc.add(const SelectFontFamily(fontFamily: 'irs'));
-        initFont = 'irs';
-      }
+  Future<void> _loadLocalTheme() async {
+    final marketId = widget.market.id!;
+    final localTheme = await MarketCustomizationStorage.loadTheme(marketId);
+    if (!mounted || localTheme == null) return;
 
-      //font color
-      if (widget.market.theme!.fontColor != null) {
-        bloc.add(
-          SelectFontColor(
-            fontColor: Color(
-              int.parse('0xFF${widget.market.theme!.fontColor}'),
-            ),
-          ),
-        );
-        initFontColor = Color(
-          int.parse('0xFF${widget.market.theme!.fontColor}'),
-        );
-      } else {
-        bloc.add(const SelectFontColor(fontColor: Colora.scaffold));
-        initFontColor = Colora.scaffold;
-      }
+    final pendingSync = await MarketCustomizationStorage.isThemePending(
+      marketId,
+    );
+    if (!mounted) return;
 
-      //font second color
-      if (widget.market.theme!.fontColor != null) {
-        bloc.add(
-          SelectSecondFontColor(
-            secondFontColor: Color(
-              int.parse('0xFF${widget.market.theme!.secondaryFontColor}'),
-            ),
-          ),
-        );
-        initFontSecondColor = Color(
-          int.parse('0xFF${widget.market.theme!.secondaryFontColor}'),
-        );
-      } else {
-        bloc.add(
-          const SelectSecondFontColor(secondFontColor: Colora.primaryColor),
-        );
-        initFontSecondColor = Colora.primaryColor;
-      }
-    } else {
-      //top color
-      bloc.add(const SelectTopColor(topColor: Colora.primaryColor));
-
-      //second top color
-      bloc.add(const SelectSecondColor(secondColor: Colora.lightBlue));
-      initSecondColor = Colora.lightBlue;
-
-      //back color
-      bloc.add(const SelectBackColor(backColor: Colora.scaffold));
-      initBackColor = Colora.scaffold;
-
-      //font family
-      bloc.add(const SelectFontFamily(fontFamily: 'irs'));
-      initFont = 'irs';
-
-      bloc.add(const SelectFontColor(fontColor: Colora.scaffold));
-      initFontColor = Colora.scaffold;
-
+    _applyTheme(localTheme);
+    if (pendingSync) {
       bloc.add(
-        const SelectSecondFontColor(secondFontColor: Colora.primaryColor),
+        SelectTheme(
+          marketId: marketId,
+          color: localTheme.color,
+          backgroundColor: localTheme.backgroundColor,
+          secondaryColor: localTheme.secondaryColor,
+          font: localTheme.font,
+          fontColor: localTheme.fontColor,
+          fontSecondaryColor: localTheme.secondaryFontColor,
+        ),
       );
-      initFontSecondColor = Colora.primaryColor;
     }
   }
 
@@ -301,10 +240,14 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                                         url,
                                                       ) => Shimmer.fromColors(
                                                         baseColor: Colors.grey
-                                                            .withOpacity(0.2),
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
                                                         highlightColor: Colors
                                                             .black
-                                                            .withOpacity(0.2),
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
                                                         direction:
                                                             ShimmerDirection
                                                                 .rtl,
@@ -576,9 +519,9 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                                       BorderRadius.circular(20),
                                                   child: Shimmer.fromColors(
                                                     baseColor: Colors.grey
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     highlightColor: Colors.black
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     direction:
                                                         ShimmerDirection.rtl,
                                                     child: Container(
@@ -675,13 +618,15 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                                                   ) => Shimmer.fromColors(
                                                                     baseColor: Colors
                                                                         .grey
-                                                                        .withOpacity(
-                                                                          0.2,
+                                                                        .withValues(
+                                                                          alpha:
+                                                                              0.2,
                                                                         ),
                                                                     highlightColor: Colors
                                                                         .black
-                                                                        .withOpacity(
-                                                                          0.2,
+                                                                        .withValues(
+                                                                          alpha:
+                                                                              0.2,
                                                                         ),
                                                                     direction:
                                                                         ShimmerDirection
@@ -892,8 +837,9 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                                                   colorFilter: ColorFilter.mode(
                                                                     state
                                                                         .topColor
-                                                                        .withOpacity(
-                                                                          0.7,
+                                                                        .withValues(
+                                                                          alpha:
+                                                                              0.7,
                                                                         ),
                                                                     BlendMode
                                                                         .srcIn,
@@ -912,8 +858,9 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                                                 decoration: BoxDecoration(
                                                                   color: Colora
                                                                       .scaffold
-                                                                      .withOpacity(
-                                                                        0.7,
+                                                                      .withValues(
+                                                                        alpha:
+                                                                            0.7,
                                                                       ),
                                                                   borderRadius:
                                                                       BorderRadius.circular(
@@ -1077,7 +1024,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black.withValues(alpha: 0.5),
                                   blurRadius: 5,
                                   spreadRadius: 2,
                                   offset: const Offset(0, 2),
@@ -1186,6 +1133,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                           bottom: 0,
                           child: CustomBottomNavigationBar(
                             marketId: widget.market.id!,
+                            market: widget.market,
                             initTopColor: state.topColor,
                             initBackColor: state.backColor,
                             initSecondColor: state.secondColor,

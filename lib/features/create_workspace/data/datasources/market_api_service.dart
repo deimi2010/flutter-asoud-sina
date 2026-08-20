@@ -194,6 +194,51 @@ class CreateMarketApiService {
     }
   }
 
+  Future getMarketBase(String marketId) async {
+    try {
+      final res = await dioClient.getData(
+        Endpoints.ownerMarketDetail(marketId),
+      );
+      return apiStatus(res);
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future getMarketContact(String marketId) async {
+    try {
+      final res = await dioClient.getData(
+        Endpoints.ownerMarketContact(marketId),
+      );
+      return apiStatus(res);
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future getMarketLocation(String marketId) async {
+    try {
+      final res = await dioClient.getData(
+        Endpoints.ownerMarketLocation(marketId),
+      );
+      return apiStatus(res);
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
+  Future getMarketSchedules(String marketId) async {
+    try {
+      final res = await dioClient.getData(
+        Endpoints.ownerScheduleList,
+        queryParameters: {'market': marketId},
+      );
+      return apiStatus(res);
+    } catch (error) {
+      return _failureFrom(error);
+    }
+  }
+
   // Inactive market
   Future inactiveMarket(String marketId) async {
     try {

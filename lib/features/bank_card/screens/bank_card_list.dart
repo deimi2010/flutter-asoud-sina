@@ -147,7 +147,7 @@ class _BankCardListScreenState extends State<BankCardListScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colora.primaryColor.withOpacity(0.7),
+      barrierColor: Colora.primaryColor.withValues(alpha: 0.7),
       builder:
           (context) => StatefulBuilder(
             builder: (context, setState) {
@@ -201,7 +201,7 @@ class _BankCardListScreenState extends State<BankCardListScreen> {
                                 child: DropdownButtonFormField<String>(
                                   style: TextStyle(color: Colors.white),
                                   // hint: Text(''),
-                                  value: banks[0]['name'],
+                                  initialValue: banks[0]['name'],
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colora.primaryColor,
@@ -1040,7 +1040,7 @@ class _BankCardListScreenState extends State<BankCardListScreen> {
                                                 hintText: 'یادداشت',
                                                 hintStyle: TextStyle(
                                                   color: Colora.primaryColor
-                                                      .withOpacity(0.5),
+                                                      .withValues(alpha: 0.5),
                                                   fontSize: 12,
                                                 ),
                                               ),

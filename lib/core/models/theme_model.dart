@@ -1,5 +1,4 @@
-class ThemeModel{
-
+class ThemeModel {
   String? color;
   String? backgroundColor;
   String? secondaryColor;
@@ -9,19 +8,16 @@ class ThemeModel{
   String? secondaryFontColor;
 
   ThemeModel({
-
     this.color,
     this.backgroundColor,
     this.secondaryColor,
 
     this.font,
     this.fontColor,
-    this.secondaryFontColor
-
+    this.secondaryFontColor,
   });
 
   ThemeModel.fromJson(Map<String, dynamic> json) {
-
     color = json['color'];
     backgroundColor = json['background_color'];
     secondaryColor = json['secondary_color'];
@@ -29,7 +25,6 @@ class ThemeModel{
     font = json['font'];
     fontColor = json['font_color'];
     secondaryFontColor = json['secondary_font_color'];
-
   }
 
   Map<String, dynamic> toJson() {
@@ -45,5 +40,4 @@ class ThemeModel{
 
     return data;
   }
-
 }

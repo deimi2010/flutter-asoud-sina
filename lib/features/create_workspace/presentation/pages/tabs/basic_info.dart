@@ -2,7 +2,6 @@ import 'package:asood/core/constants/constants.dart';
 import 'package:asood/core/formatters/lowercase_text_formatter.dart';
 import 'package:asood/core/helper/snack_bar_util.dart';
 import 'package:asood/core/helper/validators.dart';
-import 'package:asood/core/http_client/api_status.dart';
 import 'package:asood/core/router/app_routers.dart';
 import 'package:asood/core/widgets/custom_button.dart';
 import 'package:asood/core/widgets/custom_textfield.dart';

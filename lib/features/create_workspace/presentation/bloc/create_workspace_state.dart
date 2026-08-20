@@ -23,7 +23,11 @@ enum SubscriptionPaymentStatus {
   failure,
 }
 
+enum WorkspaceFormMode { create, edit }
+
 class CreateWorkSpaceState {
+  final String sessionToken;
+  final WorkspaceFormMode formMode;
   final String? marketId;
   final String businessId;
   final String idCode;
@@ -43,6 +47,7 @@ class CreateWorkSpaceState {
 
   final int activeTabIndex;
   final Set<int> completedSteps;
+  final Set<int> dirtySteps;
 
   //second view
   final String phoneNumber1;
@@ -80,8 +85,14 @@ class CreateWorkSpaceState {
   final List<MarketScheduleModel> marketSchedules;
   final bool isDraftComplete;
   final bool isDraftLoaded;
+  final bool contactExists;
+  final bool locationExists;
+
+  bool get isEditing => formMode == WorkspaceFormMode.edit;
 
   const CreateWorkSpaceState({
+    required this.sessionToken,
+    required this.formMode,
     required this.marketId,
     required this.idCode,
     required this.phoneBorder,
@@ -111,6 +122,7 @@ class CreateWorkSpaceState {
     required this.error,
     required this.activeTabIndex,
     required this.completedSteps,
+    required this.dirtySteps,
 
     required this.country,
     required this.countryId,
@@ -132,10 +144,14 @@ class CreateWorkSpaceState {
     required this.marketSchedules,
     required this.isDraftComplete,
     required this.isDraftLoaded,
+    required this.contactExists,
+    required this.locationExists,
   });
 
   factory CreateWorkSpaceState.initial() {
     return CreateWorkSpaceState(
+      sessionToken: '',
+      formMode: WorkspaceFormMode.create,
       marketId: "",
       idCode: "",
       phoneBorder: Colora.borderTag,
@@ -181,6 +197,7 @@ class CreateWorkSpaceState {
       marketType: 'shop',
       error: '',
       completedSteps: const {},
+      dirtySteps: const {},
       country: '',
       countryId: '',
       city: "",
@@ -201,10 +218,14 @@ class CreateWorkSpaceState {
       marketSchedules: [],
       isDraftComplete: false,
       isDraftLoaded: false,
+      contactExists: false,
+      locationExists: false,
     );
   }
 
   CreateWorkSpaceState copyWith({
+    String? sessionToken,
+    WorkspaceFormMode? formMode,
     String? marketId,
     String? idCode,
     String? phoneNumber1,
@@ -232,6 +253,7 @@ class CreateWorkSpaceState {
     bool? hasWorkTime,
     int? activeTabIndex,
     Set<int>? completedSteps,
+    Set<int>? dirtySteps,
     Color? phoneBorder,
     Color? emailBorder,
 
@@ -256,8 +278,12 @@ class CreateWorkSpaceState {
     List<MarketScheduleModel>? marketSchedules,
     bool? isDraftComplete,
     bool? isDraftLoaded,
+    bool? contactExists,
+    bool? locationExists,
   }) {
     return CreateWorkSpaceState(
+      sessionToken: sessionToken ?? this.sessionToken,
+      formMode: formMode ?? this.formMode,
       marketId: marketId ?? this.marketId,
       idCode: idCode ?? this.idCode,
       phoneBorder: phoneBorder ?? this.phoneBorder,
@@ -287,6 +313,7 @@ class CreateWorkSpaceState {
       hasWorkTime: hasWorkTime ?? this.hasWorkTime,
       activeTabIndex: activeTabIndex ?? this.activeTabIndex,
       completedSteps: completedSteps ?? this.completedSteps,
+      dirtySteps: dirtySteps ?? this.dirtySteps,
       country: country ?? this.country,
       countryId: countryId ?? this.countryId,
       city: city ?? this.city,
@@ -307,6 +334,8 @@ class CreateWorkSpaceState {
       marketSchedules: marketSchedules ?? this.marketSchedules,
       isDraftComplete: isDraftComplete ?? this.isDraftComplete,
       isDraftLoaded: isDraftLoaded ?? this.isDraftLoaded,
+      contactExists: contactExists ?? this.contactExists,
+      locationExists: locationExists ?? this.locationExists,
     );
   }
 }

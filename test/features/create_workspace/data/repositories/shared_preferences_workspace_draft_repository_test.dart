@@ -40,4 +40,29 @@ void main() {
     expect(restored?.schedules[0].intervalIndex, 1);
     expect(restored?.schedules[1].intervalIndex, 2);
   });
+
+  test('keeps edit drafts isolated by market id', () async {
+    final repository = SharedPreferencesWorkspaceDraftRepository();
+    const first = WorkspaceDraft(
+      currentStep: 0,
+      completedSteps: {0, 1, 2},
+      values: {'name': 'First store'},
+      socialLinks: {},
+      schedules: [],
+    );
+    const second = WorkspaceDraft(
+      currentStep: 2,
+      completedSteps: {0, 1, 2},
+      values: {'name': 'Second store'},
+      socialLinks: {},
+      schedules: [],
+    );
+
+    await repository.save(first, marketId: 'market-1');
+    await repository.save(second, marketId: 'market-2');
+
+    expect((await repository.load(marketId: 'market-1'))?.values['name'], 'First store');
+    expect((await repository.load(marketId: 'market-2'))?.values['name'], 'Second store');
+    expect(await repository.load(), isNull);
+  });
 }

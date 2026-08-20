@@ -87,6 +87,26 @@ class CreateMarketRepositoryImp implements CreateMarketRepository {
   }
 
   @override
+  Future getMarketBase(String marketId) {
+    return marketApiService.getMarketBase(marketId);
+  }
+
+  @override
+  Future getMarketContact(String marketId) {
+    return marketApiService.getMarketContact(marketId);
+  }
+
+  @override
+  Future getMarketLocation(String marketId) {
+    return marketApiService.getMarketLocation(marketId);
+  }
+
+  @override
+  Future getMarketSchedules(String marketId) {
+    return marketApiService.getMarketSchedules(marketId);
+  }
+
+  @override
   Future inactiveMarket(marketId) async {
     return await marketApiService.inactiveMarket(marketId);
   }

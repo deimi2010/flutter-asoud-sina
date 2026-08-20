@@ -99,17 +99,17 @@ class _MarketsScreenState extends State<MarketsScreen>
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
-                                            color: Colora.lightBlue.withOpacity(
-                                              0.3,
+                                            color: Colora.lightBlue.withValues(
+                                              alpha: 0.3,
                                             ),
                                           ),
                                           margin: const EdgeInsets.all(8.0),
                                           child: Shimmer.fromColors(
-                                            baseColor: Colors.grey.withOpacity(
-                                              0.2,
+                                            baseColor: Colors.grey.withValues(
+                                              alpha: 0.2,
                                             ),
                                             highlightColor: Colors.black
-                                                .withOpacity(0.2),
+                                                .withValues(alpha: 0.2),
                                             direction: ShimmerDirection.rtl,
                                             child: Container(
                                               decoration: BoxDecoration(
@@ -318,7 +318,7 @@ class _MarketsScreenState extends State<MarketsScreen>
         horizontal: Dimensions.width * 0.05,
         vertical: Dimensions.height * 0.05,
       ),
-      color: Colora.primaryColor.withOpacity(0.6),
+      color: Colora.primaryColor.withValues(alpha: 0.6),
       child: Container(
         decoration: BoxDecoration(
           color: Colora.scaffold,
@@ -927,7 +927,7 @@ class _MarketsScreenState extends State<MarketsScreen>
         horizontal: Dimensions.width * 0.05,
         vertical: Dimensions.height * 0.33,
       ),
-      color: Colora.primaryColor.withOpacity(0.7),
+      color: Colora.primaryColor.withValues(alpha: 0.7),
       child: Container(
         decoration: BoxDecoration(
           color: Colora.scaffold,

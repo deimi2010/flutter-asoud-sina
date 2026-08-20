@@ -8,10 +8,17 @@ class SharedPreferencesWorkspaceDraftRepository
     implements WorkspaceDraftRepository {
   static const _storageKey = 'create_workspace_draft_v1';
 
+  String _keyFor(String? marketId) {
+    final normalized = marketId?.trim() ?? '';
+    return normalized.isEmpty
+        ? _storageKey
+        : 'edit_workspace_draft_${normalized}_v1';
+  }
+
   @override
-  Future<WorkspaceDraft?> load() async {
+  Future<WorkspaceDraft?> load({String? marketId}) async {
     final preferences = await SharedPreferences.getInstance();
-    final encoded = preferences.getString(_storageKey);
+    final encoded = preferences.getString(_keyFor(marketId));
     if (encoded == null || encoded.isEmpty) return null;
 
     try {
@@ -45,19 +52,19 @@ class SharedPreferencesWorkspaceDraftRepository
         schedules: schedules,
       );
     } on FormatException {
-      await clear();
+      await clear(marketId: marketId);
       return null;
     } on TypeError {
-      await clear();
+      await clear(marketId: marketId);
       return null;
     }
   }
 
   @override
-  Future<void> save(WorkspaceDraft draft) async {
+  Future<void> save(WorkspaceDraft draft, {String? marketId}) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(
-      _storageKey,
+      _keyFor(marketId),
       jsonEncode({
         'current_step': draft.currentStep,
         'completed_steps': draft.completedSteps.toList()..sort(),
@@ -78,8 +85,8 @@ class SharedPreferencesWorkspaceDraftRepository
   }
 
   @override
-  Future<void> clear() async {
+  Future<void> clear({String? marketId}) async {
     final preferences = await SharedPreferences.getInstance();
-    await preferences.remove(_storageKey);
+    await preferences.remove(_keyFor(marketId));
   }
 }

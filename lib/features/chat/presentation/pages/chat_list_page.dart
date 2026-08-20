@@ -56,7 +56,7 @@ class _ChatListState extends State<ChatList> {
                               boxShadow: [
                                 BoxShadow(
                                   color: CupertinoColors.inactiveGray
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                                   spreadRadius: 1,
                                   blurRadius: 5,
                                 ),

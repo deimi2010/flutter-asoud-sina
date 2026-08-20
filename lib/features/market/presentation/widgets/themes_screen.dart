@@ -28,13 +28,20 @@ class MultiViewSliderScreen extends StatefulWidget {
 class _MultiViewSliderScreenState extends State<MultiViewSliderScreen> {
   late MarketBloc bloc;
 
-  final PageController _pageController = PageController();
+  late final PageController _pageController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     bloc = BlocProvider.of<MarketBloc>(context);
+    _pageController = PageController(initialPage: bloc.state.templateIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -185,7 +192,17 @@ class _MultiViewSliderScreenState extends State<MultiViewSliderScreen> {
                         SizedBox(height: Dimensions.height * 0.01),
 
                         //save button
-                        BlocBuilder<MarketBloc, MarketState>(
+                        BlocConsumer<MarketBloc, MarketState>(
+                          listener: (context, state) {
+                            if (state.status == CWSStatus.success) {
+                              showSnackBar(
+                                context,
+                                state.templatePendingSync
+                                    ? '\u0642\u0627\u0644\u0628 \u0631\u0648\u06cc \u062f\u0633\u062a\u06af\u0627\u0647 \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f\u061b \u067e\u0633 \u0627\u0632 \u0627\u062a\u0635\u0627\u0644 \u0627\u0631\u0633\u0627\u0644 \u0645\u06cc\u200c\u0634\u0648\u062f'
+                                    : '\u0642\u0627\u0644\u0628 \u0628\u0627 \u0645\u0648\u0641\u0642\u06cc\u062a \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f',
+                              );
+                            }
+                          },
                           builder: (context, state) {
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(20),
@@ -201,14 +218,6 @@ class _MultiViewSliderScreenState extends State<MultiViewSliderScreen> {
                                           marketId: bloc.state.marketId,
                                           template: bloc.state.templateIndex,
                                         ),
-                                      );
-                                    }
-                                    if (bloc.state.status ==
-                                            CWSStatus.success &&
-                                        state.status != CWSStatus.loading) {
-                                      showSnackBar(
-                                        context,
-                                        "قالب با موفقیت اضافه شد",
                                       );
                                     }
                                   },
@@ -439,7 +448,7 @@ class _ProductGridViewState extends State<ProductGridView> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 5,
             spreadRadius: 1,
           ),
@@ -602,7 +611,7 @@ class _ProductGridViewState extends State<ProductGridView> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 5,
             spreadRadius: 1,
           ),

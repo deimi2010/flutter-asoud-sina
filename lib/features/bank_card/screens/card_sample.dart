@@ -317,7 +317,7 @@ class _BankSampleState extends State<BankSample> {
                                 fillColor: Colora.scaffold,
                                 hintText: 'یادداشت',
                                 hintStyle: TextStyle(
-                                  color: Colora.primaryColor.withOpacity(0.5),
+                                  color: Colora.primaryColor.withValues(alpha: 0.5),
                                   fontSize: 12,
                                 ),
                               ),
