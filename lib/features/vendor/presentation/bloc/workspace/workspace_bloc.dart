@@ -11,6 +11,18 @@ class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
 
   WorkspaceBloc(this.marketRepo) : super(WorkspaceState.initial()) {
     on<LoadStores>(_getStores);
+    on<QueueStore>(
+      (event, emit) =>
+          _changeStoreStatus(event.marketId, marketRepo.queueMarket, emit),
+    );
+    on<UnpublishStore>(
+      (event, emit) =>
+          _changeStoreStatus(event.marketId, marketRepo.unpublishMarket, emit),
+    );
+    on<InactivateStore>(
+      (event, emit) =>
+          _changeStoreStatus(event.marketId, marketRepo.inactiveMarket, emit),
+    );
     on<ChangeTabView>(_changeActiveTab);
 
     on<ShowInvoice>(_changeInvoiceView);
@@ -65,6 +77,20 @@ class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     } catch (e) {
       emit(state.copyWith(status: CWSStatus.failure));
     }
+  }
+
+  Future<void> _changeStoreStatus(
+    String marketId,
+    Future<dynamic> Function(dynamic) request,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    emit(state.copyWith(status: CWSStatus.loading));
+    final result = await request(marketId);
+    if (result is Failure) {
+      emit(state.copyWith(status: CWSStatus.failure));
+      return;
+    }
+    await _getStores(LoadStores(), emit);
   }
 
   _selectMarket(SelectMarket event, Emitter<WorkspaceState> emit) {

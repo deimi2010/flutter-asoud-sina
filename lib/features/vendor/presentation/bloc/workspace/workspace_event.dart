@@ -28,6 +28,21 @@ class InvoiceConfirm extends WorkspaceEvent {
 
 class LoadStores extends WorkspaceEvent {}
 
+class QueueStore extends WorkspaceEvent {
+  const QueueStore(this.marketId);
+  final String marketId;
+}
+
+class UnpublishStore extends WorkspaceEvent {
+  const UnpublishStore(this.marketId);
+  final String marketId;
+}
+
+class InactivateStore extends WorkspaceEvent {
+  const InactivateStore(this.marketId);
+  final String marketId;
+}
+
 class SelectMarket extends WorkspaceEvent {
   final int marketId;
   const SelectMarket({required this.marketId});

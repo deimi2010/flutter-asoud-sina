@@ -41,6 +41,8 @@ abstract class CreateMarketRepository {
 
   Future<dynamic> inactiveMarket(marketId);
 
+  Future<dynamic> unpublishMarket(marketId);
+
   Future<dynamic> queueMarket(marketId);
 
   Future<dynamic> getMarketSliders(marketId);

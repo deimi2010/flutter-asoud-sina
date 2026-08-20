@@ -1,4 +1,6 @@
 import 'package:asood/core/models/market_model.dart';
+import 'package:asood/core/constants/endpoints.dart';
+import 'package:asood/core/http_client/api_status.dart';
 import 'package:asood/core/router/app_routers.dart';
 import 'package:asood/features/market/presentation/widgets/share_store.dart';
 import 'package:asood/features/vendor/presentation/bloc/workspace/workspace_bloc.dart';
@@ -7,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/constants.dart';
 import 'custom_button.dart';
@@ -28,8 +31,160 @@ class StoreCard extends StatefulWidget {
   State<StoreCard> createState() => _StoreCardState();
 }
 
-class _StoreCardState extends State<StoreCard> {
+class _StoreCardState extends State<StoreCard> with WidgetsBindingObserver {
   bool isMenuVisible = false;
+  bool _paymentPageOpened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _paymentPageOpened) {
+      _paymentPageOpened = false;
+      widget.bloc.add(LoadStores());
+    }
+  }
+
+  String get marketStatusLabel {
+    final paid = widget.market.isPaid == true;
+    switch (widget.market.status) {
+      case 'draft':
+        return paid ? 'در دست ایجاد، پرداخت شده' : 'در دست ایجاد، پرداخت نشده';
+      case 'queue':
+        return paid ? 'در صف انتشار، پرداخت شده' : 'در صف انتشار، پرداخت نشده';
+      case 'not_published':
+        return paid ? 'عدم انتشار، پرداخت شده' : 'عدم انتشار، پرداخت نشده';
+      case 'published':
+        return 'منتشر شده';
+      case 'needs_editing':
+        return paid
+            ? 'نیاز به ویرایش، پرداخت شده'
+            : 'نیاز به ویرایش، پرداخت نشده';
+      case 'inactive':
+        return 'غیر فعال';
+      default:
+        return 'نامشخص';
+    }
+  }
+
+  Future<void> _confirmAction({
+    required String title,
+    required String message,
+    required WorkspaceEvent event,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (dialogContext) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('انصراف'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('تایید'),
+              ),
+            ],
+          ),
+    );
+    if (confirmed == true) widget.bloc.add(event);
+  }
+
+  void _handlePublication() {
+    final id = widget.market.id;
+    if (id == null) return;
+    if (widget.market.status == 'published') {
+      _confirmAction(
+        title: 'عدم انتشار فروشگاه',
+        message: 'فروشگاه موقتاً از حالت انتشار خارج شود؟',
+        event: UnpublishStore(id),
+      );
+      return;
+    }
+    if (widget.market.isPaid != true) {
+      _startSubscriptionPayment();
+      return;
+    }
+    if (widget.market.status == 'queue') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('فروشگاه در صف بررسی مدیر است.')),
+      );
+      return;
+    }
+    if (widget.market.status == 'inactive') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فعال‌سازی مجدد فقط توسط مدیر انجام می‌شود.'),
+        ),
+      );
+      return;
+    }
+    _confirmAction(
+      title: 'درخواست انتشار',
+      message: 'فروشگاه برای بررسی و انتشار به مدیر ارسال شود؟',
+      event: QueueStore(id),
+    );
+  }
+
+  Future<void> _startSubscriptionPayment() async {
+    final marketId = widget.market.id;
+    if (marketId == null) return;
+
+    final result = await widget.bloc.marketRepo.createSubscriptionPayment(
+      marketId,
+    );
+    if (!mounted) return;
+    if (result is Success && result.response is Map) {
+      final sessionId = (result.response as Map)['id']?.toString() ?? '';
+      if (sessionId.isNotEmpty) {
+        final opened = await launchUrl(
+          Uri.parse(Endpoints.paymentRedirect(sessionId)),
+          mode: LaunchMode.externalApplication,
+        );
+        if (!mounted) return;
+        if (opened) {
+          _paymentPageOpened = true;
+          return;
+        }
+      }
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result is Failure
+              ? result.errorResponse.toString()
+              : 'امکان ورود به صفحه پرداخت وجود ندارد.',
+        ),
+      ),
+    );
+  }
+
+  void _shareStore() {
+    if (widget.market.isPaid != true || widget.market.status != 'published') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('اشتراک‌گذاری فقط پس از پرداخت و انتشار فعال می‌شود.'),
+        ),
+      );
+      return;
+    }
+    final businessId = widget.market.businessId;
+    if (businessId == null || businessId.isEmpty) return;
+    ShareStore.share(businessId);
+  }
 
   String shopStatus(String status) {
     String faStatus = '';
@@ -306,7 +461,7 @@ class _StoreCardState extends State<StoreCard> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                "وضعیت : ${shopStatus(widget.market.status!)}",
+                                'وضعیت: $marketStatusLabel',
                                 style: ATextStyle.light12.copyWith(
                                   color: Colors.white,
                                 ),
@@ -386,11 +541,7 @@ class _StoreCardState extends State<StoreCard> {
                           //share
                           CustomButton(
                             width: 110,
-                            onPress: () {
-                              ShareStore.share(
-                                widget.market.businessId.toString(),
-                              );
-                            },
+                            onPress: _shareStore,
                             text: "اشتراک گذاری",
                           ),
                         ],
@@ -403,23 +554,41 @@ class _StoreCardState extends State<StoreCard> {
                           CustomButton(
                             width: 110,
                             onPress: () {
-                              statusMessage(context);
+                              _handlePublication();
                             },
-                            text: "انتشار",
+                            text:
+                                widget.market.status == 'published'
+                                    ? 'عدم انتشار'
+                                    : 'انتشار',
                           ),
 
                           // payment
                           CustomButton(
                             width: 110,
-                            onPress: () {},
-                            text: "پرداخت اشتراک",
+                            onPress:
+                                widget.market.isPaid == true
+                                    ? () {}
+                                    : _startSubscriptionPayment,
+                            text:
+                                widget.market.isPaid == true
+                                    ? 'اشتراک پرداخت شده'
+                                    : 'پرداخت اشتراک',
                           ),
 
                           //deactivate
                           CustomButton(
                             width: 110,
-                            onPress: () {},
-                            text: "غیرفعال",
+                            onPress: () {
+                              final id = widget.market.id;
+                              if (id == null) return;
+                              _confirmAction(
+                                title: 'غیر فعال کردن فروشگاه',
+                                message:
+                                    'فعال‌کردن مجدد این فروشگاه فقط توسط مدیر ممکن است.',
+                                event: InactivateStore(id),
+                              );
+                            },
+                            text: 'غیر فعال',
                           ),
                         ],
                       ),

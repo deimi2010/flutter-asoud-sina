@@ -92,6 +92,11 @@ class CreateMarketRepositoryImp implements CreateMarketRepository {
   }
 
   @override
+  Future unpublishMarket(marketId) async {
+    return await marketApiService.unpublishMarket(marketId);
+  }
+
+  @override
   Future queueMarket(marketId) async {
     return await marketApiService.queueMarket(marketId);
   }

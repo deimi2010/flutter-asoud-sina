@@ -207,6 +207,18 @@ class CreateMarketApiService {
     }
   }
 
+  Future unpublishMarket(String marketId) async {
+    try {
+      final res = await dioClient.postData(
+        "${Endpoints.ownerUnpublish}/$marketId/",
+        const <String, dynamic>{},
+      );
+      return apiStatus(res);
+    } catch (e) {
+      return customApiStatus();
+    }
+  }
+
   // Queue market
   Future queueMarket(String marketId) async {
     try {

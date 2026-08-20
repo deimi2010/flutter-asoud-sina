@@ -44,6 +44,7 @@ class Endpoints {
   static String ownerLogo = '$baseMarket/logo';
   static String ownerQueue = '$baseMarket/queue';
   static String ownerInactive = '$baseMarket/inactive';
+  static String ownerUnpublish = '$baseMarket/unpublish';
   static String ownerLocationCreate = '$baseMarket/location/create/';
   static String ownerUpdateMarketLocation(String marketId) =>
       '$baseMarket/location/update/$marketId/';
